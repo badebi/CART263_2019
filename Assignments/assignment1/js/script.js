@@ -12,7 +12,13 @@ to overlap another circle (food) in order to grow bigger.
 
 // Constants defining key quantities
 const AVATAR_SIZE_GAIN = 50;
-const AVATAR_SIZE_LOSS = 1;
+const AVATAR_SIZE_LOSS = .3;
+
+let xoff = 0.0;
+let yoff = 1000;
+
+let n = 0;
+let m = 0;
 
 // Avatar is an object defined by its properties
 let avatar = {
@@ -21,7 +27,7 @@ let avatar = {
   maxSize: 64,
   size: 64,
   active: true,
-  color: '#cccc55'
+  color: '#987ef2'
 }
 
 // Food is an object defined by its properties
@@ -46,7 +52,7 @@ function preload() {
 // Create the canvas, position the food, remove the cursor
 
 function setup() {
-  createCanvas(windowWidth,windowHeight);
+  createCanvas(windowWidth, windowHeight);
   positionFood();
   noCursor();
 }
@@ -65,10 +71,14 @@ function draw() {
   }
 
   // Otherwise we handle the game
-  background(0);
+  background(255);
+
+
   updateAvatar();
   checkCollision();
   displayAvatar();
+
+  updateFood();
   displayFood();
 }
 
@@ -81,7 +91,7 @@ function updateAvatar() {
   avatar.x = mouseX;
   avatar.y = mouseY;
   // Shrink the avatar and use constrain() to keep it to reasonable bounds
-  avatar.size = constrain(avatar.size - AVATAR_SIZE_LOSS,0,avatar.maxSize);
+  avatar.size = constrain(avatar.size - AVATAR_SIZE_LOSS, 0, avatar.maxSize);
   if (avatar.size === 0) {
     avatar.active = false;
   }
@@ -93,10 +103,10 @@ function updateAvatar() {
 // Check if the distance is small enough to be an overlap of the two circles
 // If so, grow the avatar and reposition the food
 function checkCollision() {
-  let d = dist(avatar.x,avatar.y,food.x,food.y);
-  if (d < avatar.size/2 + food.size/2) {
-    avatar.size = constrain(avatar.size + AVATAR_SIZE_GAIN,0,avatar.maxSize);
-    positionFood();
+  let d = dist(avatar.x, avatar.y, food.x, food.y);
+  if (d < avatar.size / 2 + food.size / 2) {
+    avatar.size = constrain(avatar.size + AVATAR_SIZE_GAIN, 0, avatar.maxSize);
+      positionFood();
   }
 }
 
@@ -109,7 +119,7 @@ function displayAvatar() {
   push();
   noStroke();
   fill(avatar.color);
-  ellipse(avatar.x,avatar.y,avatar.size);
+  ellipse(avatar.x, avatar.y, avatar.size);
   pop();
 }
 
@@ -122,7 +132,7 @@ function displayFood() {
   push();
   noStroke();
   fill(food.color);
-  ellipse(food.x,food.y,food.size);
+  ellipse(food.x, food.y, food.size);
   pop();
 }
 
@@ -130,6 +140,14 @@ function displayFood() {
 //
 // Set the food's position properties to random numbers within the canvas dimensions
 function positionFood() {
-  food.x = random(0,width);
-  food.y = random(0,height);
+  xoff = random(0, width);
+  yoff = random(0, height);
+}
+
+function updateFood() {
+  food.x = constrain(noise(xoff) * width, 0, width);
+  food.y = constrain(noise(yoff) * height, 0, height);
+  xoff += random(0.01,0.03);
+  yoff += random(0.01,0.03);
+
 }
