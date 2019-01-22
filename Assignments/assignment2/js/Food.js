@@ -5,13 +5,12 @@ class Food extends Agent {
     this.maxSize = maxSize;
     this.xoff = 0.0;
     this.yoff = 1000;
+    this.history = [];
   }
 
   reset() {
     this.xoff = random(0, width);
     this.yoff = random(0, height);
-    // this.x = random(0, width);
-    // this.y = random(0, height);
     this.size = random(this.minSize, this.maxSize);
   }
 
@@ -20,5 +19,15 @@ class Food extends Agent {
     this.y = constrain(noise(this.yoff) * height, 0, height);
     this.xoff += random(0.01,0.03);
     this.yoff += random(0.01,0.03);
+
+    let v = createVector (this.x, this.y);
+    this.history.push(v);
+  }
+
+  showTrail() {
+    for (let i = 0; i < this.history.length; i++){
+      let pos = this.history[i];
+      ellipse(pos.x, pos.y, 8,8);
+    }
   }
 }

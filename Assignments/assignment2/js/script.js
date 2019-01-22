@@ -35,7 +35,10 @@ function draw() {
   if (myAvatar.isCollidingWith(myFood)){
     myAvatar.eating(myFood);
   }
+
+  myFood.showTrail();
   myFood.display();
+
 
 
 }
