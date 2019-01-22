@@ -9,6 +9,9 @@ class Food extends Agent {
   }
 
   reset() {
+    if (myFoods.length > 1){
+      myFoods.splice(0, 1);
+    }
     this.xoff = random(0, width);
     this.yoff = random(0, height);
     this.size = random(this.minSize, this.maxSize);
@@ -22,7 +25,7 @@ class Food extends Agent {
 
     for (let i = 0; i < this.history.length; i++){
       this.history[i].x += random(-2,2);
-      this.history[i].y += random(-2,2); 
+      this.history[i].y += random(-2,2);
     }
     let v = createVector (this.x, this.y);
     this.history.push(v);

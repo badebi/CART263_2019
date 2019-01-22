@@ -12,6 +12,7 @@ class Avatar extends Agent {
     this.x = mouseX;
     this.y = mouseY;
     this.size = constrain(this.size - this.sizeLoss, 0, this.maxSize);
+
     if (this.size <.3 * this.maxSize){
       myFoods.push(new Food(random(0,width),random(0,height), foodMinSize, foodMaxSie));
     }
@@ -26,7 +27,7 @@ class Avatar extends Agent {
       return;
     }
     this.size = constrain(this.size + theFood.size, 0, this.maxSize);
-
+    
     theFood.reset();
   }
 }

@@ -4,6 +4,7 @@ const avatarSize = 65;
 const avatarSizeLoss = .7;
 const foodMinSize = 15;
 const foodMaxSie = 60;
+const maxFood = 15;
 
 let myAvatar;
 let myFoods = [];
@@ -40,4 +41,9 @@ function draw() {
   })
 
   myAvatar.display();
+  
+
+  if (myFoods.length > maxFood){
+    myFoods.splice(0,1)
+  }
 }
