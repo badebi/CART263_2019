@@ -20,14 +20,23 @@ class Food extends Agent {
     this.xoff += random(0.01,0.03);
     this.yoff += random(0.01,0.03);
 
+    for (let i = 0; i < this.history.length; i++){
+      this.history[i].x += random(-2,2);
+      this.history[i].y += random(-2,2); 
+    }
     let v = createVector (this.x, this.y);
     this.history.push(v);
+    if (this.history.length > 25){
+      this.history.splice(0,1)
+    }
+
+
   }
 
   showTrail() {
     for (let i = 0; i < this.history.length; i++){
       let pos = this.history[i];
-      ellipse(pos.x, pos.y, 8,8);
+      ellipse(pos.x, pos.y, i, i);
     }
   }
 }

@@ -6,7 +6,7 @@ const foodMinSize = 15;
 const foodMaxSie = 60;
 
 let myAvatar;
-let myFood;
+let myFoods = [];
 
 
 function preload() {
@@ -14,11 +14,10 @@ function preload() {
 }
 
 
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   myAvatar = new Avatar(mouseX, mouseY, avatarSize,avatarSizeLoss);
-  myFood = new Food(random(0,width),random(0,height), foodMinSize, foodMaxSie);
+  myFoods[0] = new Food(random(0,width),random(0,height), foodMinSize, foodMaxSie);
 }
 
 
@@ -29,16 +28,16 @@ function setup() {
 function draw() {
   background('#ffffff');
   myAvatar.update();
+
+
+  myFoods.forEach(function(food){
+    food.update();
+    food.showTrail();
+    if (myAvatar.isCollidingWith(food)){
+      myAvatar.eating(food);
+    }
+    food.display();
+  })
+
   myAvatar.display();
-
-  myFood.update();
-  if (myAvatar.isCollidingWith(myFood)){
-    myAvatar.eating(myFood);
-  }
-
-  myFood.showTrail();
-  myFood.display();
-
-
-
 }
