@@ -29,3 +29,7 @@ div {
   text-decoration: underline;
   color: red
 }
+
+.found {
+  background-color:#FFFF00;
+}
