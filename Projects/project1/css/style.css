@@ -3,3 +3,7 @@
 This is the style file for this project.
 
 **********************************************/
+
+#trash {
+  max-width: 81px;
+}
