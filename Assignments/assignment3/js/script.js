@@ -65,34 +65,34 @@ let secretsFound = 0;
 
 // A version using anonymous functions:
 
-$(document).ready(function () {
+$(document).ready(function() {
   $spans = $('span:not(.secret)');
 
 
-  $spans.on('click',function () {
+  $spans.on('click', function() {
     $(this).removeClass('revealed');
     $(this).addClass('redacted');
   });
 
-  $('.secret').on('mouseover', function(){
+  $('.secret').on('mouseover', function() {
     $(this).removeClass('secret');
     $(this).addClass('found');
 
     $(this).off();
-    secretsFound ++;
+    secretsFound++;
 
-        $('#secret-count').text(secretsFound);
+    $('#secret-count').text(secretsFound);
     console.log("secrets Found:" + secretsFound);
-
   });
 
-  setInterval(function () {
-    $spans.each(function () {
+
+  setInterval(function() {
+    $spans.each(function() {
       let r = Math.random();
       if (r < 0.1) {
         $(this).removeClass('redacted');
         $(this).addClass('revealed');
       }
     });
-  },500);
+  }, 500);
 });
