@@ -4,6 +4,40 @@ This is the style file for this project.
 
 **********************************************/
 
+html {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+
+}
+
+/* Room background */
+#room {
+	margin: 0 auto;
+	padding: 0px;
+	height: 100%;
+	overflow: hidden;
+  background-image: url("https://timedotcom.files.wordpress.com/2016/02/vangoghbedroom_hero.jpg");
+  background-size: cover;
+}
+
 #trash {
-  max-width: 81px;
+  max-width: 85px;
+}
+
+/* Positioning the bin in the scene */
+#bin {
+  width: 15%;
+  top: 42%;
+  left: 30%;
+  position: absolute !important;
+}
+
+.ear{
+  width: 10%;
 }
