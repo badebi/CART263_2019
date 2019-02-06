@@ -3,25 +3,23 @@
 This is the style file for this project.
 
 **********************************************/
-
 html {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 /* Room background */
 #room {
-	margin: 0 auto;
-	padding: 0px;
-	height: 100%;
-	overflow: hidden;
+  margin: 0 auto;
+  padding: 0px;
+  height: 100%;
+  overflow: hidden;
   background-image: url("https://timedotcom.files.wordpress.com/2016/02/vangoghbedroom_hero.jpg");
   background-size: cover;
 }
@@ -38,6 +36,9 @@ body {
   position: absolute !important;
 }
 
-.ear{
+.ear {
   width: 10%;
+  /* I've found that !important is REALLY important
+	Because after a dialog box shows up, weird things happen to positions */
+  position: absolute !important;
 }

@@ -10,10 +10,13 @@ Ebrahim (Ebby) Badawi
 ******************/
 const MAX_EARS = 3;
 
-let $bin;
-//  a variable to keep record of hoe many ears have been thrown into the trash
-let earCounter = 0;
 
+let $bin;
+//  a variable to keep record of how many ears have been thrown into the trash
+let earCounter = 0;
+//  a variable to to keep track of what phase we're at
+let phaseNumber = 1;
+//  an array of some randome stupid sentences
 let thinking = [
   "What the fuck?",
   "You wanna THINK about it ?!",
@@ -51,9 +54,12 @@ function earDropped(event, ui) {
   //  else, tell player that the bin is full and it should be emptied
   if (earCounter < MAX_EARS) {
     //  add another ear
-    addEar();
+    if (phaseNumber === 1) {
+      addEar();
+    }
   } else {
     theBinIsFull();
+    console.log('full');
   }
 
 }
@@ -104,6 +110,7 @@ function theBinIsFull() {
     close: function() {
       //  if the bin is clicked, call the emptyBin() function
       $bin.on('click', emptyBin);
+
     },
     //  it will be
     // contained within the body tag, and can't be dragged out of it.
@@ -136,11 +143,14 @@ function emptyBin() {
       "let me think again!": function() {
         //  convince player that there is no other way, and the bin have to be emptied
         let thinkingResponse = thinking[Math.floor(Math.random() * thinking.length)];
-        $emptyAlert.append("<p>"+ thinkingResponse +"</p>");
+        $emptyAlert.append("<p>" + thinkingResponse + "</p>");
       }
     },
     //  when the alert box closes, empty the bin, and call changePhase() function
     close: function() {
+      //  I had to turn off the event handler here, otherwise everytime player clicks
+      //  on the bin, it adds up and makes a mess
+      $bin.off('click');
       $bin.attr('src', 'assets/images/trash_empty.png');
       changePhase();
     },
@@ -152,6 +162,13 @@ function emptyBin() {
 
 //+++++++++++++++++++++>>>>> changePhase() <<<<<+++++++++++++++++++++++++++
 
+//  called after each time the bin gets emptied.
+//  it resets the earCounter, adds to the phaseNumber (so we go to the next phase),
+//  and literally empties the bin inside the room (ears all over the place).
 function changePhase() {
-
+  earCounter = 0;
+  phaseNumber++;
+  for (var i = 0; i < MAX_EARS; i++) {
+    addEar();
+  }
 }
