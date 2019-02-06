@@ -6,9 +6,8 @@ Project1 | Sisyphusesque
 Ebrahim (Ebby) Badawi
 
 
-
 ******************/
-const MAX_EARS = 3;
+const MAX_EARS = 15;
 //  the super duper song
 let music = new Audio('assets/music/Sisyphus - Calm It Down.mp3');
 //  an array to keep the sfx source files
@@ -20,6 +19,10 @@ let sfxSounds = [
   "assets/sounds/sfx(5).wav"
 ]
 let dropSFX = new Audio("assets/sounds/dropSFX.wav");
+
+let alertSFX = new Audio("assets/sounds/alertSFX.wav");
+
+let emptyAlertSFX = new Audio("assets/sounds/emptyAlertSFX.wav");
 
 let $bin;
 //  a variable to keep record of how many ears have been thrown into the trash
@@ -72,7 +75,6 @@ function earDropped(event, ui) {
   } else {
     theBinIsFull();
   }
-
 }
 
 //+++++++++++++++++++++>>>>> addEar() <<<<<+++++++++++++++++++++++++++
@@ -108,6 +110,7 @@ function addEar() {
       soundFX.play();
     },
     stop: function() {
+      dropSFX.currentTime = 0;
       dropSFX.play();
     }
   });
@@ -117,6 +120,9 @@ function addEar() {
 
 //  called whenever all ears have been thrown to the garbage
 function theBinIsFull() {
+  //  play alert sfx
+  alertSFX.currentTime = 0;
+  alertSFX.play();
   //  create a div which will turn to the dialog box
   let $alert = $('<div></div>');
   //  give it an awesome title
@@ -152,6 +158,9 @@ function theBinIsFull() {
 
 //  called when player clicks on the full bin (when all ears all in it)
 function emptyBin() {
+  //  play empty alert sfx
+  emptyAlertSFX.currentTime = 0;
+  emptyAlertSFX.play();
   //  again, this div will turn to a dialog box
   let $emptyAlert = $('<div></div>');
   //  name the dialog box awesomely
@@ -171,6 +180,9 @@ function emptyBin() {
         $(this).dialog('close');
       },
       "let me think again!": function() {
+        //  play alert sfx
+        alertSFX.currentTime = 0;
+        alertSFX.play();
         //  convince player that there is no other way, and the bin have to be emptied
         let thinkingResponse = thinking[Math.floor(Math.random() * thinking.length)];
         $emptyAlert.append("<p>" + thinkingResponse + "</p>");
