@@ -10,6 +10,7 @@ Ebrahim (Ebby) Badawi
 ******************/
 const MAX_EARS = 3;
 
+let music = new Audio('assets/music/Sisyphus - Calm It Down.mp3');
 
 let $bin;
 //  a variable to keep record of how many ears have been thrown into the trash
@@ -29,6 +30,8 @@ let thinking = [
 ]
 
 $(document).ready(function() {
+  // don't play the music at the beginning
+  music.pause();
   //  Get the bin element from the page
   $bin = $('#bin');
   //  make it droppable
@@ -80,7 +83,22 @@ function addEar() {
     top: Math.random() * ($(window).height() - $ear.height()),
     left: Math.random() * ($(window).width() - $ear.width())
   });
-  $('.ear').draggable();
+  $('.ear').draggable({
+    start: function() {
+      //  start the music when player grabs the first ear
+      if (music.paused) {
+        //  make it loop, cus it makes you calm
+        music.loop = true;
+        //  turn the valume up
+        music.volume = 1;
+        //  now let's chill
+        music.play();
+      }
+    },
+    stop: function() {
+
+    }
+  });
 }
 
 //+++++++++++++++++++++>>>>> theBinIsFull() <<<<<+++++++++++++++++++++++++++
