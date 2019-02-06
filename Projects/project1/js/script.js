@@ -2,9 +2,8 @@
 
 /*****************
 
-Project1 | Sisyphusesque
+Project1 | Van Goghs Sisyphusesque Experience
 Ebrahim (Ebby) Badawi
-
 
 ******************/
 const MAX_EARS = 15;
