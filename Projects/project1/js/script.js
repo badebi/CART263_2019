@@ -2,7 +2,7 @@
 
 /*****************
 
-Project1 | Van Goghs Sisyphusesque Experience
+Project1 | Van Gogh's Sisyphusesque Experience
 Ebrahim (Ebby) Badawi
 
 ******************/
