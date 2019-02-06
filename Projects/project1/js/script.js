@@ -19,6 +19,7 @@ let sfxSounds = [
   "assets/sounds/sfx(4).wav",
   "assets/sounds/sfx(5).wav"
 ]
+let dropSFX = new Audio("assets/sounds/dropSFX.wav");
 
 let $bin;
 //  a variable to keep record of how many ears have been thrown into the trash
@@ -107,7 +108,7 @@ function addEar() {
       soundFX.play();
     },
     stop: function() {
-
+      dropSFX.play();
     }
   });
 }
