@@ -9,8 +9,16 @@ Ebrahim (Ebby) Badawi
 
 ******************/
 const MAX_EARS = 3;
-
+//  the super duper song
 let music = new Audio('assets/music/Sisyphus - Calm It Down.mp3');
+//  an array to keep the sfx source files
+let sfxSounds = [
+  "assets/sounds/sfx(1).wav",
+  "assets/sounds/sfx(2).wav",
+  "assets/sounds/sfx(3).wav",
+  "assets/sounds/sfx(4).wav",
+  "assets/sounds/sfx(5).wav"
+]
 
 let $bin;
 //  a variable to keep record of how many ears have been thrown into the trash
@@ -62,7 +70,6 @@ function earDropped(event, ui) {
     }
   } else {
     theBinIsFull();
-    console.log('full');
   }
 
 }
@@ -94,6 +101,10 @@ function addEar() {
         //  now let's chill
         music.play();
       }
+      //  play random sound effect
+      let randomSFX = sfxSounds[Math.floor(Math.random() * sfxSounds.length)];
+      let soundFX= new Audio(randomSFX);
+      soundFX.play();
     },
     stop: function() {
 
