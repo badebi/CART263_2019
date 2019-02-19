@@ -22,18 +22,18 @@ $(document).ready(function() {
   $fly.draggable();
   $fly.on('mousedown', function() {
     buzz.play();
-    $mouth.attr('src', 'assets/images/mouth-open.png');
+    $mouth.attr('src', 'assets/images/mouthOpen.png');
     $fly.on('mouseup', function() {
       buzz.pause();
-      $mouth.attr('src', 'assets/images/mouth-closed.png');
+      $mouth.attr('src', 'assets/images/mouthClosed.png');
     })
   });
 
   $mouth.on('hover', function() {
-    $mouth.attr('src', 'assets/images/mouth-open.png');
+    $mouth.attr('src', 'assets/images/mouthOpen.png');
   });
   $mouth.on('mouseleave', function() {
-    $mouth.attr('src', 'assets/images/mouth-closed.png');
+    $mouth.attr('src', 'assets/images/mouthClosed.png');
   });
 
   $mouth.droppable({
@@ -62,7 +62,7 @@ function flyEaten() {
   console.log('fly has been eaten');
 
   $mouth.on('mouseleave', function() {
-    $mouth.attr('src', 'assets/images/mouth-closed.png');
+    $mouth.attr('src', 'assets/images/mouthClosed.png');
   });
   // flyEaten();
 }
@@ -73,11 +73,11 @@ function chew() {
   //   crunch.pause();
   //   $mouth.attr('src', 'assets/images/mouth-closed.png');
   // });
-  if ($mouth.attr('src') === "assets/images/mouth-open.png") {
-    $mouth.attr('src', 'assets/images/mouth-closed.png');
+  if ($mouth.attr('src') === "assets/images/mouthOpen.png") {
+    $mouth.attr('src', 'assets/images/mouthClosed.png');
     crunch.play();
   } else {
-    $mouth.attr('src', 'assets/images/mouth-open.png');
+    $mouth.attr('src', 'assets/images/mouthOpen.png');
   }
 
 }
