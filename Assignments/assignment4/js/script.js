@@ -121,6 +121,7 @@ function flyEaten() {
   swallow.play();
   swallow.addEventListener("ended", function() {
     burp.play();
+    //resetFly();
   });
   $mouth.on('mouseleave', function() {
     $mouth.attr('src', 'assets/images/cartoonMouthSmile.png');
@@ -140,5 +141,16 @@ function chew() {
   } else {
     $mouth.attr('src', 'assets/images/cartoonMouthChewOpen2.png');
   }
-
 }
+
+// function resetFly() {
+//   let $newFly = '<img id="fly" src="assets/images/fly2.png" alt="it suppose to be a fly">';
+//   $('body').append($newFly);
+//   $fly = $('#fly');
+//   $fly.draggable();
+//   $newFly.offset({
+//     top: Math.random() * ($(window).height() - $ear.height()),
+//     left: Math.random() * ($(window).width() - $ear.width())
+//   });
+//
+// }
