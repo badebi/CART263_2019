@@ -156,6 +156,15 @@ let complments = [
   "clap clap clap",
   "you Da best"
 ];
+
+let shits = [
+  "shit, why?",
+  "shit, again?",
+  "shit, shit, shit?",
+  "shit, don't do this?",
+  "shit, I feel you?",
+  "shit, don't worry! every thing is going to be alright"
+];
 let answers = [];
 let correctAnimal;
 let score = 0;
@@ -169,6 +178,7 @@ function setup() {
   if (annyang) {
     var command = {
       "I give up": shakeTheShit,
+      "I gave up": shakeTheShit,
       "Say it again": repeatTheShit,
       "what": repeatTheShit,
       "I think it is *shit": checkTheShit,
@@ -204,6 +214,11 @@ function buttonClicked() {
 function shakeTheShit() {
   // ????? Why 5 times ???
   console.log("gave up");
+  responsiveVoice.speak(shits[Math.floor(Math.random() * shits.length)], 'UK English Male', {
+    rate: Math.random(),
+    pitch: Math.random(),
+    onend: reset
+  });
 
   $('.guess').each(function() {
     if ($(this).text() === correctAnimal) {
@@ -214,12 +229,20 @@ function shakeTheShit() {
     };
   });
 
-  setTimeout(function() {
-    $('.guess').remove();
-    score = 0;
-    $('.score').text("Your Score:   " + score);
-    newRound();
-  }, 1350);
+  // setTimeout(function() {
+  //   $('.guess').remove();
+  //   score = 0;
+  //   $('.score').text("Your Score:   " + score);
+  //
+  //   newRound();
+  // }, 1350);
+}
+
+function reset() {
+  $('.guess').remove();
+  score = 0;
+  $('.score').text("Your Score:   " + score);
+  newRound();
 }
 
 function repeatTheShit() {
