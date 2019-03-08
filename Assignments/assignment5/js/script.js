@@ -183,9 +183,8 @@ function startGame() {
   console.log("The Shit Has Begun!!!");
   let $score = $('<div class="score"></div>');
   $score.text("Your Score: " + score);
-
   $('body').append($score);
-    $('body').append('<div class="options"></div>')
+  $('body').append('<div class="options"></div>')
   newRound();
 }
 

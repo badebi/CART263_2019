@@ -4,16 +4,24 @@ This is the style file for this project.
 
 **********************************************/
 .score {
-text-align: center;
-font-family: fantasy;
-font-size: 2em;
-margin-top: 33px;
-margin-bottom: 33px;
+  text-align: center;
+  font-family: fantasy;
+  font-size: 2em;
+  margin-top: 33px;
+  margin-bottom: 33px;
 }
 
 .options {
-display: block;
-text-align: center;
-margin-left: auto;
-margin-right: auto;
+  display: block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+  font-family: fantasy;
+  font-size: 4em;
+  margin-top: 33px;
+  margin-bottom: 33px;
 }
