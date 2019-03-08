@@ -166,7 +166,8 @@ function setup() {
     var command = {
       "I give up": shakeTheShit,
       "Say it again": repeatTheShit,
-      "I think it is *shit": checkTheShit
+      "I think it is *shit": checkTheShit,
+      "I think it's *shit": checkTheShit
     }
     annyang.addCommands(command);
     annyang.start();
@@ -210,27 +211,47 @@ function buttonClicked() {
 function shakeTheShit() {
   // ????? Why 5 times ???
   console.log("gave up");
-  $('.guess').fadeOut(1300, function() {
-    $('.guess').remove();
-  });
+
   $('.guess').each(function() {
     if ($(this).text() === correctAnimal) {
       $(this).effect('shake');
+      $('.guess').fadeOut(1300, function() {
+        //$('.guess').remove();
+      });
     };
   });
 
-setTimeout(function() {
-//  $('.guess').remove();
-  newRound();
-},1350);
+  setTimeout(function() {
+     $('.guess').remove();
+    newRound();
+  }, 1350);
 }
 
 function repeatTheShit() {
-
+  speakAnimal(correctAnimal);
 }
 
-function checkTheShit() {
+function checkTheShit(shitToCheck) {
+  if (shitToCheck === correctAnimal) {
+    console.log("removed");
+    $('.guess').remove();
+    responsiveVoice.speak(complments[Math.floor(Math.random() * complments.length)], 'UK English Male', {
+      rate: Math.random(),
+      pitch: Math.random(),
+      onend: newRound
+    });
+    //setTimeout(newRound,1000);
 
+    console.log("correct");
+  } else {
+    console.log("Wrong");
+    $('.guess').each(function() {
+      if ($(this).text() === shitToCheck) {
+        $(this).effect('shake');
+      };
+    });
+    speakAnimal(correctAnimal);
+  }
 }
 
 function newRound() {
