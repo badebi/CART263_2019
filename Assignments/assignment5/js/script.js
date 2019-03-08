@@ -151,10 +151,14 @@ let complments = [
   "You're genius",
   "You're smarter than Google and Mary Poppins combined",
   "The person who raised you deserves a medal for a job well done.",
-  "awesome"
+  "awesome",
+  "Oooo LaaLa",
+  "clap clap clap",
+  "you Da best"
 ];
 let answers = [];
 let correctAnimal;
+let score = 0;
 
 $(document).ready(setup);
 
@@ -177,7 +181,11 @@ function setup() {
 function startGame() {
   $('#beginTheShit').remove();
   console.log("The Shit Has Begun!!!");
+  let $score = $('<div class="score"></div>');
+  $score.text("Your Score: " + score);
 
+  $('body').append($score);
+    $('body').append('<div class="options"></div>')
   newRound();
 }
 
@@ -186,26 +194,11 @@ function addButton(label) {
   $button.text(label);
   $button.button();
   $button.on('click', buttonClicked);
-  $('body').append($button);
+  $('.options').append($button);
 }
 
 function buttonClicked() {
-  if ($(this).text() === correctAnimal) {
-    console.log("removed");
-    $('.guess').remove();
-    responsiveVoice.speak(complments[Math.floor(Math.random() * complments.length)], 'UK English Male', {
-      rate: Math.random(),
-      pitch: Math.random(),
-      onend: newRound
-    });
-    //setTimeout(newRound,1000);
-
-    console.log("correct");
-  } else {
-    console.log("Wrong");
-    $(this).effect('shake');
-    speakAnimal(correctAnimal);
-  }
+  checkTheShit($(this).text());
 }
 
 function shakeTheShit() {
@@ -222,7 +215,9 @@ function shakeTheShit() {
   });
 
   setTimeout(function() {
-     $('.guess').remove();
+    $('.guess').remove();
+    score = 0;
+    $('.score').text("Your Score:   " + score);
     newRound();
   }, 1350);
 }
@@ -235,6 +230,8 @@ function checkTheShit(shitToCheck) {
   if (shitToCheck === correctAnimal) {
     console.log("removed");
     $('.guess').remove();
+    score++;
+    $('.score').text("Your Score: " + score);
     responsiveVoice.speak(complments[Math.floor(Math.random() * complments.length)], 'UK English Male', {
       rate: Math.random(),
       pitch: Math.random(),
