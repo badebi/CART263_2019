@@ -170,6 +170,7 @@ function setup() {
     var command = {
       "I give up": shakeTheShit,
       "Say it again": repeatTheShit,
+      "what": repeatTheShit,
       "I think it is *shit": checkTheShit,
       "I think it's *shit": checkTheShit
     }
