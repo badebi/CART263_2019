@@ -3,3 +3,28 @@
 This is the style file for this project.
 
 **********************************************/
+
+#table {
+  max-width: 100%;
+
+  background-size: cover;
+  overflow: hidden;
+
+}
+
+#rorschachCard {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10%;
+  width: 50%;
+ position: relative !important;
+}
+
+#hand {
+position: relative;
+  display: block;
+
+  width: 25%;
+
+}
