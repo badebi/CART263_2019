@@ -10,7 +10,7 @@ author, and this description to match your project!
 
 ******************/
 const MAX_WRONG_NAMES = 3;
-
+/*-------------------------->>>> VARIABLES <<<<--------------------------*/
 let rorschachCards = [
   'assets/images/rorschach1.jpg',
   'assets/images/rorschach2.jpg',
@@ -56,6 +56,11 @@ $(document).ready(function() {
   $.getJSON('/data/firstNames.json', dataLoaded);
 });
 
+/*----------------------->>>> dataLoaded(data) <<<<-----------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function dataLoaded(data) {
   listOfNames = data.firstNames;
   magicNumber = -1.35 * ($(".handAndCard").innerHeight());
@@ -96,6 +101,11 @@ function dataLoaded(data) {
   }
 }
 
+/*------------------------>>>> changePhase() <<<<------------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function changePhase() {
   annyang.removeCommands();
   switch (phaseState) {
@@ -113,6 +123,11 @@ function changePhase() {
   }
 }
 
+/*--------------------->>>> startInterrogation() <<<<---------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function startInterrogation() {
   if (introLineIndex === intro.length - 2) {
     // Remove intro commands
@@ -130,10 +145,20 @@ function startInterrogation() {
   }
 }
 
+/*------------------------>>>> noAnswer(tag) <<<<------------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function noAnswer(tag) {
   responsiveVoice.speak("I have no answer for what you've said, ask me why!", 'UK English Male', voiceParameters);
 }
 
+/*----------------->>>> dontUnderstandTheName(name) <<<<-----------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function dontUnderstandTheName(name) {
   console.log(name);
   let tempName = getSimilarName(name);
@@ -154,6 +179,11 @@ function dontUnderstandTheName(name) {
   }
 }
 
+/*--------------------->>>> getSimilarName(name) <<<<---------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function getSimilarName(name) {
   let firstChar = name.charAt(0);
   let secondChar = name.charAt(1);
@@ -162,15 +192,13 @@ function getSimilarName(name) {
   let maxIndex = 0;
 
   $.each(listOfNames, function(index, value) {
-    if (value.charAt(0) === firstChar) {
-      if (value.charAt(1) === secondChar) {
+    if (value.charAt(0) === firstChar && value.charAt(1) === secondChar) {
         if (minIndex > index) {
           minIndex = index;
         };
         if (maxIndex < index) {
           maxIndex = index;
         };
-      };
     };
   });
 
@@ -183,28 +211,47 @@ function getSimilarName(name) {
   };
 }
 
+/*----------------------->>>> bringInTheCard() <<<<-----------------------
+* It shuffles and picks one of the Rorschach Cards, then a hand brings
+* it into the frame.
+*-------------------------------->>>><<<<--------------------------------*/
 function bringInTheCard() {
+  // Pick a card from our set of cards
   shuffle(rorschachCards);
-  $rorschachCard.attr('src', rorschachCards[0])
+  // Replace it with the hidden card that is in the HTML
+  $rorschachCard.attr('src', rorschachCards[0]);
+  // Toggle the display of the hand & the card & animate the into the frame
   $(".handAndCard").toggle().animate({
     "top": 0
   }, 2000, "swing");
+  // Animate the hand back out the frame wher it was
   $("#hand").animate({
     "top": magicNumber
   }, 2000, "swing");
 }
 
+/*---------------------->>>> changeTheTheCard() <<<<----------------------
+*
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
 function changeTheTheCard() {
 
 }
 
+/*-------------->>>> getRandomElement(array, min, max) <<<<--------------
+* Gets an array with a range, and returns the value of a random index
+* within the specified range.
+*-------------------------------->>>><<<<--------------------------------*/
 function getRandomElement(array, min, max) {
   return array[Math.floor(Math.random() * (max - min + 1) + min)];
 }
 
-/*
- * Shuffles array in place. In case we need it
- */
+/*-------------------------->>>> shuffle(a) <<<<--------------------------
+* It shuffles the array which is given to it
+* So after shuffling, it returnes the array whose values are placed in
+* different random indexes.
+*-------------------------------->>>><<<<--------------------------------*/
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
