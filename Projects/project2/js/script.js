@@ -26,11 +26,16 @@ let voiceParameters = {
   rate: 0.75,
   volume: 0.5,
 }
- let command, command2;
+let command, command2;
 
-$(document).ready(setup);
+let listOfNames;
 
-function setup() {
+$(document).ready(function() {
+  $.getJSON('/data/firstNames.json', dataLoaded);
+});
+
+function dataLoaded(data) {
+  listOfNames = data;
   magicNumber = -1.35 * ($(".handAndCard").innerHeight());
   // $(".handAndCard").innerHeight(magicNumber);
   $(".handAndCard").animate({
@@ -40,7 +45,7 @@ function setup() {
   $("body").on("click", function() {
     if (!clickedOnce) {
       responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
-      introLineIndex ++;
+      introLineIndex++;
       clickedOnce = !clickedOnce;
     } else {
       responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
@@ -48,14 +53,14 @@ function setup() {
   });
 
   if (annyang) {
-     command = {
+    command = {
       "I'm ready": startInterrogation,
       "I am ready": startInterrogation,
       "why": startInterrogation,
     }
 
     command2 = {
-      "*tag": name
+      "*tag": dontUnderstandTheName
     }
 
     annyang.addCommands(command);
@@ -72,14 +77,14 @@ function startInterrogation() {
     return;
   }
   responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
-  introLineIndex ++;
+  introLineIndex++;
   if (introLineIndex === intro.length - 2 && annyang.isListening()) {
     startInterrogation();
     console.log("tell me your name");
   }
 }
 
-function name(name) {
+function dontUnderstandTheName(name) {
   console.log("name");
   responsiveVoice.speak(`${name}?`, 'UK English Male', voiceParameters);
 }
