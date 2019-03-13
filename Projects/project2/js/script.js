@@ -2,8 +2,8 @@
 
 /*****************
 
-Title of Project
-Author Name
+The Interrogation
+Ebby Badawi
 
 This is a template. You must fill in the title,
 author, and this description to match your project!
@@ -13,7 +13,7 @@ let magicNumber;
 let intro = [
   "When ever you're ready, just tell me I'm ready",
   "don't you want to know why should you be ready?",
-  "you're not the one who is asking the questions here! I ask questions. now tell me your name",
+  "you're not the one who is asking the questions here! I-ask questions. now tell me your name",
   "just answer the question, what is your name, just the name!",
   "why did you click on the page? we start from the top then! what is your name?"
 ]
@@ -35,7 +35,7 @@ $(document).ready(function() {
 });
 
 function dataLoaded(data) {
-  listOfNames = data;
+  listOfNames = data.firstNames;
   magicNumber = -1.35 * ($(".handAndCard").innerHeight());
   // $(".handAndCard").innerHeight(magicNumber);
   $(".handAndCard").animate({
@@ -57,6 +57,7 @@ function dataLoaded(data) {
       "I'm ready": startInterrogation,
       "I am ready": startInterrogation,
       "why": startInterrogation,
+      "*tag": noAnswer
     }
 
     command2 = {
@@ -84,9 +85,43 @@ function startInterrogation() {
   }
 }
 
+function noAnswer(tag) {
+  responsiveVoice.speak("I have no answer for what you've said, ask me why!", 'UK English Male', voiceParameters);
+}
+
 function dontUnderstandTheName(name) {
-  console.log("name");
-  responsiveVoice.speak(`${name}?`, 'UK English Male', voiceParameters);
+  console.log(name);
+
+  getSimilarName(name);
+
+  let firstChar = name.charAt(0);
+  let secondChar = name.charAt(1);
+  let minIndex = 4950;
+  let maxIndex = 0;
+
+  $.each(listOfNames, function(index, value) {
+    if (value.charAt(0) === firstChar) {
+      if (value.charAt(1) === secondChar) {
+        if (minIndex > index) {
+          minIndex = index;
+        }
+        if (maxIndex < index) {
+          maxIndex = index;
+        }
+      } else {
+        if (minIndex > index) {
+          minIndex = index;
+        }
+        if (maxIndex < index) {
+          maxIndex = index;
+        }
+      }
+    }
+    console.log(`min: ${minIndex}, max: ${maxIndex}`);
+  });
+
+  let similarName = getRandomElement(listOfNames, minIndex, maxIndex);
+  responsiveVoice.speak(`${similarName}???`, 'UK English Male', voiceParameters);
 }
 
 function bringInTheCard() {
@@ -100,6 +135,10 @@ function bringInTheCard() {
 
 function takeOutTheCard() {
 
+}
+
+function getRandomElement(array, min, max) {
+  return array[Math.floor(Math.random() * (max - min + 1) + min)];
 }
 
 /*
