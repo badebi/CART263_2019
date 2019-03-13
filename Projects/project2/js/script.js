@@ -9,8 +9,13 @@ This is a template. You must fill in the title,
 author, and this description to match your project!
 
 ******************/
+
+/*-------------------------->>>> CONSTANTS <<<<--------------------------*/
+
 const MAX_WRONG_NAMES = 3;
+
 /*-------------------------->>>> VARIABLES <<<<--------------------------*/
+// Array of list if card Rorschach locations 
 let rorschachCards = [
   'assets/images/rorschach1.jpg',
   'assets/images/rorschach2.jpg',
@@ -23,9 +28,7 @@ let rorschachCards = [
   'assets/images/rorschach9.jpg',
   'assets/images/rorschach10.jpg'
 ]
-let $rorschachCard;
-
-let magicNumber;
+// Array of the interrogator's dialogs for the introduction
 let intro = [
   "When ever you're ready, just say I'm ready",
   "don't you want to know why should you be ready?",
@@ -33,54 +36,60 @@ let intro = [
   "just answer the question, what is your name, just the name!",
   "why did you click on the page? we start from the top then! what is your name?"
 ]
-let introLineIndex = 0;
-
-let clickedOnce = false;
-
+// Voice parameters for our super cool interrogator
 let voiceParameters = {
   pitch: 1,
   rate: 0.75,
   volume: 0.5,
 }
+// Variable to hold our card element
+let $rorschachCard;
+// Variable to hold the perfect awesome position for our elements when they are off-frame
+let magicNumber;
+// Variable to handle the order of lies being spoken by the interrogator
+let introLineIndex = 0;
+// Boolean to know whether the player has once clicked on the screen
+let clickedOnce = false;
+// Variables to hold annyang's commands for different phases
 let phase1Commands, phase2Commands, phase3Commands;
-
+// Variable to keep track of phases & help us change from one to another
 let phaseState = 1;
-
+// Variable to hold the list of names which comes from the JSON file
 let listOfNames;
+// Variable to hold the name, by which the player will be called
 let fixedName;
+// Variable to keep track of how many times the interrogator calles the pplayer by a wrong name
 let wrongNameCounter = 0;
+// Boolean to know whether or not the interrogator has found a similar name to player's name
 let nameFound = false;
 
-
+// Check if the document is ready to run
 $(document).ready(function() {
+  // If document is ready and data (List of Names) has loaded, call
+  // dataLoaded(data) function.
   $.getJSON('/data/firstNames.json', dataLoaded);
 });
 
 /*----------------------->>>> dataLoaded(data) <<<<-----------------------
-*
-*
-*
+* It is called when the JSON data is loaded, and it basically starts our
+* super awesome interrogation.
 *-------------------------------->>>><<<<--------------------------------*/
 function dataLoaded(data) {
+  // Store the list of names into thr listOfNames variable
   listOfNames = data.firstNames;
-  magicNumber = -1.35 * ($(".handAndCard").innerHeight());
+  // magicNumber is the the ABSOLUTELY PERFECT position for hand and card,
+  // when they are out of frame, which I had a painfully hard time figuring out.
+  magicNumber = -1.42 * ($(".handAndCard").innerHeight());
+  // Get the Rorschach Card element from the page
   $rorschachCard = $("#rorschachCard");
-  // $(".handAndCard").innerHeight(magicNumber);
+  // Move the hand and the card in their initial position, which is outside of frame
   $(".handAndCard").animate({
     "top": magicNumber
   });
 
-  $("body").on("click", function() {
-    if (!clickedOnce) {
-      responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
-      introLineIndex++;
-      clickedOnce = !clickedOnce;
-    } else {
-      responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
-    }
-  });
-
+  // Make sure annyang is available
   if (annyang) {
+    // Add the commands to annyang. Each phase has its own set of commands.
     phase1Commands = {
       "I'm ready": startInterrogation,
       "I am ready": startInterrogation,
@@ -96,9 +105,23 @@ function dataLoaded(data) {
       "*tag": dontUnderstandTheName
     }
 
+    // Give the defined commands for phase1 to annyang by using its
+    // .addCommands() function.
     annyang.addCommands(phase1Commands);
+    // Annyand, start listening to me
     annyang.start();
   }
+
+
+  $("body").on("click", function() {
+    if (!clickedOnce) {
+      responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
+      introLineIndex++;
+      clickedOnce = !clickedOnce;
+    } else {
+      responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
+    }
+  });
 }
 
 /*------------------------>>>> changePhase() <<<<------------------------
@@ -146,11 +169,11 @@ function startInterrogation() {
 }
 
 /*------------------------>>>> noAnswer(tag) <<<<------------------------
-*
-*
-*
+* When it hears something that is off the track, it redirects the conversation
+* in a very intelligent way. :D
 *-------------------------------->>>><<<<--------------------------------*/
 function noAnswer(tag) {
+  // responsiveVoice, please say this line
   responsiveVoice.speak("I have no answer for what you've said, ask me why!", 'UK English Male', voiceParameters);
 }
 
@@ -180,17 +203,25 @@ function dontUnderstandTheName(name) {
 }
 
 /*--------------------->>>> getSimilarName(name) <<<<---------------------
-*
-*
-*
+* Gets whatever player has said as his/her name, takes its first two characters
+* and searches through the names which start with those two characters, and by
+* calling getRandomElement function, it picks one of those names and returns it.
 *-------------------------------->>>><<<<--------------------------------*/
 function getSimilarName(name) {
+
+  // Declare variables to get the first two characters of what player just
+  // said and store them.
   let firstChar = name.charAt(0);
   let secondChar = name.charAt(1);
   console.log(firstChar + secondChar);
+
+  // Declare minIndex and maxIndex to find the range whithin which we want to
+  // find our random similar name
   let minIndex = 10000;
   let maxIndex = 0;
 
+  // Go through the array of names and find the names starting with specified
+  // characters and find and keep the record of their range insided the array
   $.each(listOfNames, function(index, value) {
     if (value.charAt(0) === firstChar && value.charAt(1) === secondChar) {
         if (minIndex > index) {
@@ -201,8 +232,11 @@ function getSimilarName(name) {
         };
     };
   });
-
   console.log(`min: ${minIndex}, max: ${maxIndex}`);
+
+  // Some times it couldn't find the range, so let us know if it happen
+  // if not, pass the range and array to getRandomElement() function and
+  // return the name it returns
   if (minIndex > maxIndex) {
     nameFound = false;
   } else {
