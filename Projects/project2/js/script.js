@@ -9,7 +9,21 @@ This is a template. You must fill in the title,
 author, and this description to match your project!
 
 ******************/
-const MAX_WRONG_NAMES = 5;
+const MAX_WRONG_NAMES = 3;
+
+let rorschachCards = [
+  'assets/images/rorschach1.jpg',
+  'assets/images/rorschach2.jpg',
+  'assets/images/rorschach3.jpg',
+  'assets/images/rorschach4.jpg',
+  'assets/images/rorschach5.jpg',
+  'assets/images/rorschach6.jpg',
+  'assets/images/rorschach7.jpg',
+  'assets/images/rorschach8.jpg',
+  'assets/images/rorschach9.jpg',
+  'assets/images/rorschach10.jpg'
+]
+let $rorschachCard;
 
 let magicNumber;
 let intro = [
@@ -45,6 +59,7 @@ $(document).ready(function() {
 function dataLoaded(data) {
   listOfNames = data.firstNames;
   magicNumber = -1.35 * ($(".handAndCard").innerHeight());
+  $rorschachCard = $("#rorschachCard");
   // $(".handAndCard").innerHeight(magicNumber);
   $(".handAndCard").animate({
     "top": magicNumber
@@ -91,6 +106,7 @@ function changePhase() {
     case 2:
       annyang.addCommands(phase3Commands);
       phaseState++;
+      setTimeout(bringInTheCard, 3000);
       break;
     default:
 
@@ -168,6 +184,8 @@ function getSimilarName(name) {
 }
 
 function bringInTheCard() {
+  shuffle(rorschachCards);
+  $rorschachCard.attr('src', rorschachCards[0])
   $(".handAndCard").toggle().animate({
     "top": 0
   }, 2000, "swing");
