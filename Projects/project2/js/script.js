@@ -9,6 +9,8 @@ This is a template. You must fill in the title,
 author, and this description to match your project!
 
 ******************/
+const MAX_WRONG_NAMES = 5;
+
 let magicNumber;
 let intro = [
   "When ever you're ready, just say I'm ready",
@@ -28,9 +30,11 @@ let voiceParameters = {
 }
 let phase1Commands, phase2Commands, phase3Commands;
 
+let phaseState = 1;
+
 let listOfNames;
 let fixedName;
-let counter = 0;
+let wrongNameCounter = 0;
 let nameFound = false;
 
 
@@ -77,12 +81,29 @@ function dataLoaded(data) {
   }
 }
 
+function changePhase() {
+  annyang.removeCommands();
+  switch (phaseState) {
+    case 1:
+      annyang.addCommands(phase2Commands);
+      phaseState++;
+      break;
+    case 2:
+      annyang.addCommands(phase3Commands);
+      phaseState++;
+      break;
+    default:
+
+  }
+}
+
 function startInterrogation() {
   if (introLineIndex === intro.length - 2) {
     // Remove intro commands
     responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
-    annyang.removeCommands();
-    annyang.addCommands(phase2Commands);
+    changePhase();
+    // annyang.removeCommands();
+    // annyang.addCommands(phase2Commands);
     return;
   }
   responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
@@ -101,17 +122,18 @@ function dontUnderstandTheName(name) {
   console.log(name);
   let tempName = getSimilarName(name);
 
-  if (counter < 3) {
+  if (wrongNameCounter < MAX_WRONG_NAMES) {
     if (nameFound) {
       responsiveVoice.speak(`${tempName}?!`, 'UK English Male', voiceParameters);
-      counter++;
+      wrongNameCounter++;
     } else {
       responsiveVoice.speak(`${name}?!`, 'UK English Male', voiceParameters);
     };
   } else {
     fixedName = tempName;
-    annyang.removeCommands();
-    annyang.addCommands(phase3Commands);
+    changePhase();
+    // annyang.removeCommands();
+    // annyang.addCommands(phase3Commands);
     responsiveVoice.speak(`enough-fooling-around! from now on, your name is ${fixedName}!`, 'UK English Male', voiceParameters);
   }
 }
@@ -154,7 +176,7 @@ function bringInTheCard() {
   }, 2000, "swing");
 }
 
-function takeOutTheCard() {
+function changeTheTheCard() {
 
 }
 
