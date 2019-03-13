@@ -14,6 +14,14 @@ author, and this description to match your project!
 $(document).ready(setup);
 
 function setup() {
+  let magicNumber = -1.35 * ($(".handAndCard").innerHeight());
+  // $(".handAndCard").innerHeight(magicNumber);
+  $(".handAndCard").animate({"top":  magicNumber});
+  $("body").click(function () {
+    $(".handAndCard").toggle().animate({"top":  0},2000,"swing");
+    $("#hand").animate({"top":  magicNumber},2000, "swing");
+  });
+
 
 
   if (annyang) {
@@ -24,6 +32,7 @@ function setup() {
     annyang.start();
   }
 }
+
 
 /*
  * Shuffles array in place. In case we need it
