@@ -11,9 +11,9 @@ author, and this description to match your project!
 ******************/
 let magicNumber;
 let intro = [
-  "When ever you're ready, just tell me I'm ready",
+  "When ever you're ready, just say I'm ready",
   "don't you want to know why should you be ready?",
-  "you're not the one who is asking the questions here! I-ask questions. now tell me your name",
+  "you're not the one who's asking questions here! I-ask the questions. now tell me your name",
   "just answer the question, what is your name, just the name!",
   "why did you click on the page? we start from the top then! what is your name?"
 ]
@@ -26,9 +26,13 @@ let voiceParameters = {
   rate: 0.75,
   volume: 0.5,
 }
-let command, command2;
+let phase1Commands, phase2Commands, phase3Commands;
 
 let listOfNames;
+let fixedName;
+let counter = 0;
+let nameFound = false;
+
 
 $(document).ready(function() {
   $.getJSON('/data/firstNames.json', dataLoaded);
@@ -53,18 +57,22 @@ function dataLoaded(data) {
   });
 
   if (annyang) {
-    command = {
+    phase1Commands = {
       "I'm ready": startInterrogation,
       "I am ready": startInterrogation,
       "why": startInterrogation,
       "*tag": noAnswer
     }
 
-    command2 = {
+    phase2Commands = {
       "*tag": dontUnderstandTheName
     }
 
-    annyang.addCommands(command);
+    phase3Commands = {
+      "*tag": dontUnderstandTheName
+    }
+
+    annyang.addCommands(phase1Commands);
     annyang.start();
   }
 }
@@ -74,7 +82,7 @@ function startInterrogation() {
     // Remove intro commands
     responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
     annyang.removeCommands();
-    annyang.addCommands(command2);
+    annyang.addCommands(phase2Commands);
     return;
   }
   responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
@@ -91,12 +99,28 @@ function noAnswer(tag) {
 
 function dontUnderstandTheName(name) {
   console.log(name);
+  let tempName = getSimilarName(name);
 
-  getSimilarName(name);
+  if (counter < 3) {
+    if (nameFound) {
+      responsiveVoice.speak(`${tempName}?!`, 'UK English Male', voiceParameters);
+      counter++;
+    } else {
+      responsiveVoice.speak(`${name}?!`, 'UK English Male', voiceParameters);
+    };
+  } else {
+    fixedName = tempName;
+    annyang.removeCommands();
+    annyang.addCommands(phase3Commands);
+    responsiveVoice.speak(`enough-fooling-around! from now on, your name is ${fixedName}!`, 'UK English Male', voiceParameters);
+  }
+}
 
+function getSimilarName(name) {
   let firstChar = name.charAt(0);
   let secondChar = name.charAt(1);
-  let minIndex = 4950;
+  console.log(firstChar + secondChar);
+  let minIndex = 10000;
   let maxIndex = 0;
 
   $.each(listOfNames, function(index, value) {
@@ -104,24 +128,21 @@ function dontUnderstandTheName(name) {
       if (value.charAt(1) === secondChar) {
         if (minIndex > index) {
           minIndex = index;
-        }
+        };
         if (maxIndex < index) {
           maxIndex = index;
-        }
-      } else {
-        if (minIndex > index) {
-          minIndex = index;
-        }
-        if (maxIndex < index) {
-          maxIndex = index;
-        }
-      }
-    }
-    console.log(`min: ${minIndex}, max: ${maxIndex}`);
+        };
+      };
+    };
   });
 
-  let similarName = getRandomElement(listOfNames, minIndex, maxIndex);
-  responsiveVoice.speak(`${similarName}???`, 'UK English Male', voiceParameters);
+  console.log(`min: ${minIndex}, max: ${maxIndex}`);
+  if (minIndex > maxIndex) {
+    nameFound = false;
+  } else {
+    nameFound = true;
+    return getRandomElement(listOfNames, minIndex, maxIndex);
+  };
 }
 
 function bringInTheCard() {
