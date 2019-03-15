@@ -15,7 +15,7 @@ author, and this description to match your project!
 const MAX_WRONG_NAMES = 3;
 
 /*-------------------------->>>> VARIABLES <<<<--------------------------*/
-// Array of list if card Rorschach locations 
+// Array of list if card Rorschach locations
 let rorschachCards = [
   'assets/images/rorschach1.jpg',
   'assets/images/rorschach2.jpg',
@@ -67,7 +67,7 @@ let nameFound = false;
 $(document).ready(function() {
   // If document is ready and data (List of Names) has loaded, call
   // dataLoaded(data) function.
-  $.getJSON('/data/firstNames.json', dataLoaded);
+  $.getJSON('data/firstNames.json', dataLoaded);
 });
 
 /*----------------------->>>> dataLoaded(data) <<<<-----------------------
