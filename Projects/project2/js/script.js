@@ -102,7 +102,8 @@ function dataLoaded(data) {
     }
 
     phase3Commands = {
-      "*tag": dontUnderstandTheName
+      "change the card": changeTheCard,
+      "I see *tag": handleAnswer
     }
 
     // Give the defined commands for phase1 to annyang by using its
@@ -113,21 +114,33 @@ function dataLoaded(data) {
   }
 
 
+  let $pressStart = $('.start');
+  $pressStart.button().hide();
+  $pressStart.fadeIn().click(function () {
+    $(this).fadeOut("1000",function () {
+        $(this).remove();
+    });
+    //
+    responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
+    introLineIndex++;
+    clickedOnce = !clickedOnce;
+  });
+
+  $pressStart.offset({
+    top: $(window).height() / 2,
+    left: $(window).width() / 2
+  });
+
   $("body").on("click", function() {
-    if (!clickedOnce) {
-      responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
-      introLineIndex++;
-      clickedOnce = !clickedOnce;
-    } else {
+    if (clickedOnce) {
       responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
     }
   });
 }
 
 /*------------------------>>>> changePhase() <<<<------------------------
-*
-*
-*
+* It is called whenever the game state needs to be changed.
+* It removes the current annyang commands, and adds the next phases commands
 *-------------------------------->>>><<<<--------------------------------*/
 function changePhase() {
   annyang.removeCommands();
@@ -264,12 +277,42 @@ function bringInTheCard() {
   }, 2000, "swing");
 }
 
-/*---------------------->>>> changeTheTheCard() <<<<----------------------
+/*---------------------->>>> changeTheCard() <<<<----------------------
 *
 *
 *
 *-------------------------------->>>><<<<--------------------------------*/
-function changeTheTheCard() {
+function changeTheCard() {
+  // Animate the hand into frame
+  $("#hand").animate({
+    "top": 0
+  }, 2000, "swing");
+  // Animate the hand and the card out of the frame
+  $(".handAndCard").animate({
+    "top": magicNumber
+  }, 1000, "swing");
+
+  // Change the card by
+  // Picking a card from our set of cards
+  shuffle(rorschachCards);
+  // Replace the card
+  $rorschachCard.attr('src', rorschachCards[0]);
+
+  // Bring in the new card (Animate the hand and the card into the frame)
+  $(".handAndCard").animate({
+    "top": 0
+  }, 2000, "swing");
+ // Animate the hand out of the frame
+  $("#hand").animate({
+    "top": magicNumber
+  }, 2000, "swing");
+}
+
+/*------------------------->>>>handleAnswer() <<<<------------------------
+*
+*
+*-------------------------------->>>><<<<--------------------------------*/
+function handleAnswer() {
 
 }
 
