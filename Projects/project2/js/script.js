@@ -36,6 +36,16 @@ let intro = [
   "just answer the question, what is your name, just the name!",
   "why did you click on the page? we start from the top then! what is your name?"
 ]
+// Array of excuses to understand what is the name of the player
+let excuses = [
+  "Sorry, what?",
+  "pardon me, I didn't quite get that",
+  "hit me again",
+  "what a wonderful name, but say it again because I couldn't hear what you've said",
+  "scream your name louder, if you may",
+  "what?",
+  "sorry, I wasn't listening. could you please repeat?"
+]
 // Voice parameters for our super cool interrogator
 let voiceParameters = {
   pitch: 1,
@@ -50,10 +60,12 @@ let magicNumber;
 let introLineIndex = 0;
 // Boolean to know whether the player has once clicked on the screen
 let clickedOnce = false;
+//
+let gameStarted = false;
 // Variables to hold annyang's commands for different phases
 let phase1Commands, phase2Commands, phase3Commands;
 // Variable to keep track of phases & help us change from one to another
-let phaseState = 1;
+let phaseState = 2;
 // Variable to hold the list of names which comes from the JSON file
 let listOfNames;
 // Variable to hold the name, by which the player will be called
@@ -71,9 +83,9 @@ $(document).ready(function() {
 });
 
 /*----------------------->>>> dataLoaded(data) <<<<-----------------------
-* It is called when the JSON data is loaded, and it basically starts our
-* super awesome interrogation.
-*-------------------------------->>>><<<<--------------------------------*/
+ * It is called when the JSON data is loaded, and it basically starts our
+ * super awesome interrogation.
+ *-------------------------------->>>><<<<--------------------------------*/
 function dataLoaded(data) {
   // Store the list of names into thr listOfNames variable
   listOfNames = data.firstNames;
@@ -116,9 +128,9 @@ function dataLoaded(data) {
 
   let $pressStart = $('.start');
   $pressStart.button().hide();
-  $pressStart.fadeIn().click(function () {
-    $(this).fadeOut("1000",function () {
-        $(this).remove();
+  $pressStart.fadeIn().click(function() {
+    $(this).fadeOut("1000", function() {
+      $(this).remove();
     });
     //
     responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
@@ -132,16 +144,16 @@ function dataLoaded(data) {
   });
 
   $("body").on("click", function() {
-    if (clickedOnce) {
+    if (clickedOnce && gameStarted) {
       responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
     }
   });
 }
 
 /*------------------------>>>> changePhase() <<<<------------------------
-* It is called whenever the game state needs to be changed.
-* It removes the current annyang commands, and adds the next phases commands
-*-------------------------------->>>><<<<--------------------------------*/
+ * It is called whenever the game state needs to be changed.
+ * It removes the current annyang commands, and adds the next phases commands
+ *-------------------------------->>>><<<<--------------------------------*/
 function changePhase() {
   annyang.removeCommands();
   switch (phaseState) {
@@ -160,11 +172,12 @@ function changePhase() {
 }
 
 /*--------------------->>>> startInterrogation() <<<<---------------------
-*
-*
-*
-*-------------------------------->>>><<<<--------------------------------*/
+ *
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
 function startInterrogation() {
+  gameStarted = true;
   if (introLineIndex === intro.length - 2) {
     // Remove intro commands
     responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
@@ -182,19 +195,19 @@ function startInterrogation() {
 }
 
 /*------------------------>>>> noAnswer(tag) <<<<------------------------
-* When it hears something that is off the track, it redirects the conversation
-* in a very intelligent way. :D
-*-------------------------------->>>><<<<--------------------------------*/
+ * When it hears something that is off the track, it redirects the conversation
+ * in a very intelligent way. :D
+ *-------------------------------->>>><<<<--------------------------------*/
 function noAnswer(tag) {
   // responsiveVoice, please say this line
   responsiveVoice.speak("I have no answer for what you've said, ask me why!", 'UK English Male', voiceParameters);
 }
 
 /*----------------->>>> dontUnderstandTheName(name) <<<<-----------------
-*
-*
-*
-*-------------------------------->>>><<<<--------------------------------*/
+ *
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
 function dontUnderstandTheName(name) {
   console.log(name);
   let tempName = getSimilarName(name);
@@ -204,7 +217,8 @@ function dontUnderstandTheName(name) {
       responsiveVoice.speak(`${tempName}?!`, 'UK English Male', voiceParameters);
       wrongNameCounter++;
     } else {
-      responsiveVoice.speak(`${name}?!`, 'UK English Male', voiceParameters);
+      shuffle(excuses);
+      responsiveVoice.speak(`${excuses[0]}?!`, 'UK English Male', voiceParameters);
     };
   } else {
     fixedName = tempName;
@@ -216,10 +230,10 @@ function dontUnderstandTheName(name) {
 }
 
 /*--------------------->>>> getSimilarName(name) <<<<---------------------
-* Gets whatever player has said as his/her name, takes its first two characters
-* and searches through the names which start with those two characters, and by
-* calling getRandomElement function, it picks one of those names and returns it.
-*-------------------------------->>>><<<<--------------------------------*/
+ * Gets whatever player has said as his/her name, takes its first two characters
+ * and searches through the names which start with those two characters, and by
+ * calling getRandomElement function, it picks one of those names and returns it.
+ *-------------------------------->>>><<<<--------------------------------*/
 function getSimilarName(name) {
 
   // Declare variables to get the first two characters of what player just
@@ -233,16 +247,17 @@ function getSimilarName(name) {
   let minIndex = 10000;
   let maxIndex = 0;
 
+  // TODO: I can put these into a if statement so it will just calculate once
   // Go through the array of names and find the names starting with specified
   // characters and find and keep the record of their range insided the array
   $.each(listOfNames, function(index, value) {
     if (value.charAt(0) === firstChar && value.charAt(1) === secondChar) {
-        if (minIndex > index) {
-          minIndex = index;
-        };
-        if (maxIndex < index) {
-          maxIndex = index;
-        };
+      if (minIndex > index) {
+        minIndex = index;
+      };
+      if (maxIndex < index) {
+        maxIndex = index;
+      };
     };
   });
   console.log(`min: ${minIndex}, max: ${maxIndex}`);
@@ -259,10 +274,18 @@ function getSimilarName(name) {
 }
 
 /*----------------------->>>> bringInTheCard() <<<<-----------------------
-* It shuffles and picks one of the Rorschach Cards, then a hand brings
-* it into the frame.
-*-------------------------------->>>><<<<--------------------------------*/
+ * It shuffles and picks one of the Rorschach Cards, then a hand brings
+ * it into the frame.
+ *-------------------------------->>>><<<<--------------------------------*/
 function bringInTheCard() {
+  // Instructions of this phase
+  responsiveVoice.speak(`okay ${fixedName}!
+    Now I'm going to show you some cards and you're going to tell me what you see.
+    simply say I see blah bla blah.
+    If you want me to change the card for any reason, say change the card, and
+    I will gently do so.
+    let's begin now ${fixedName}, tell me what do you see!`, 'UK English Male', voiceParameters);
+
   // Pick a card from our set of cards
   shuffle(rorschachCards);
   // Replace it with the hidden card that is in the HTML
@@ -278,10 +301,10 @@ function bringInTheCard() {
 }
 
 /*---------------------->>>> changeTheCard() <<<<----------------------
-*
-*
-*
-*-------------------------------->>>><<<<--------------------------------*/
+ *
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
 function changeTheCard() {
   // Animate the hand into frame
   $("#hand").animate({
@@ -302,33 +325,33 @@ function changeTheCard() {
   $(".handAndCard").animate({
     "top": 0
   }, 2000, "swing");
- // Animate the hand out of the frame
+  // Animate the hand out of the frame
   $("#hand").animate({
     "top": magicNumber
   }, 2000, "swing");
 }
 
 /*------------------------->>>>handleAnswer() <<<<------------------------
-*
-*
-*-------------------------------->>>><<<<--------------------------------*/
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
 function handleAnswer() {
 
 }
 
 /*-------------->>>> getRandomElement(array, min, max) <<<<--------------
-* Gets an array with a range, and returns the value of a random index
-* within the specified range.
-*-------------------------------->>>><<<<--------------------------------*/
+ * Gets an array with a range, and returns the value of a random index
+ * within the specified range.
+ *-------------------------------->>>><<<<--------------------------------*/
 function getRandomElement(array, min, max) {
   return array[Math.floor(Math.random() * (max - min + 1) + min)];
 }
 
 /*-------------------------->>>> shuffle(a) <<<<--------------------------
-* It shuffles the array which is given to it
-* So after shuffling, it returnes the array whose values are placed in
-* different random indexes.
-*-------------------------------->>>><<<<--------------------------------*/
+ * It shuffles the array which is given to it
+ * So after shuffling, it returnes the array whose values are placed in
+ * different random indexes.
+ *-------------------------------->>>><<<<--------------------------------*/
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
