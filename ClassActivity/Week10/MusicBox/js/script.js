@@ -75,9 +75,9 @@ function playNote() {
 }
 
 function playDrum() {
-  if (patternIndex == 7) {
-    patternIndex = 0;
-  }
+  // if (patternIndex == pattern.length) {
+  //   patternIndex = 0;
+  // }
   let symbols = pattern[patternIndex];
 
   if(symbols.indexOf('x') != -1) {
@@ -92,7 +92,9 @@ function playDrum() {
   if(symbols.indexOf('d') != -1) {
     dog.play();
   }
-  patternIndex ++;
+  // patternIndex ++;
+  // Advance the pattern by a beat
+  patternIndex = (patternIndex + 1) % pattern.length;
 }
 
 function getRandomFrom(array) {
