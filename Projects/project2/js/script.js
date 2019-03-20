@@ -46,6 +46,10 @@ let excuses = [
   "what?",
   "sorry, I wasn't listening. could you please repeat?"
 ]
+//
+let changingCardsDialog = [
+
+]
 // Voice parameters for our super cool interrogator
 let voiceParameters = {
   pitch: 1,
@@ -120,9 +124,6 @@ function dataLoaded(data) {
       "I see *tag": handleAnswer
     }
 
-    // Give the defined commands for phase1 to annyang by using its
-    // .addCommands() function.
-    annyang.addCommands(phase1Commands);
     // Annyand, start listening to me
     annyang.start();
   }
@@ -134,6 +135,9 @@ function dataLoaded(data) {
     $(this).fadeOut("1000", function() {
       $(this).remove();
     });
+    // Give the defined commands for phase1 to annyang by using its
+    // .addCommands() function.
+    annyang.addCommands(phase1Commands);
     //
     responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
     introLineIndex++;
@@ -141,8 +145,10 @@ function dataLoaded(data) {
   });
 
   $pressStart.offset({
-    top: $(window).height() / 2,
-    left: $(window).width() / 2
+    // top: $(window).height() / 2,
+    // left: $(window).width() / 2
+    top: Math.max(0, (($(window).height() - $pressStart.outerHeight()) / 2) + $(window).scrollTop()),
+    left: Math.max(0, (($(window).width() - $pressStart.outerWidth()) / 2) + $(window).scrollLeft())
   });
 
   $("body").on("click", function() {
@@ -392,10 +398,10 @@ function handleAnswer(answer) {
   let tempMood = getRandomElement(listOfMoods, moodMinIndex, moodMaxIndex);
   let tempOccupation = getRandomElement(listOfOccupations, occupationMinIndex, occupationMaxIndex);
 
-  responsiveVoice(`${tempMood} ${tempOccupation}?`,'UK English Male', {
-      rate: Math.random(),
-      pitch: Math.random()
-    });
+  responsiveVoice(`${tempMood} ${tempOccupation}?`, 'UK English Male', {
+    rate: Math.random(),
+    pitch: Math.random()
+  });
 }
 
 /*-------------->>>> getRandomElement(array, min, max) <<<<--------------
