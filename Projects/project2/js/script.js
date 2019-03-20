@@ -3,7 +3,7 @@
 /*****************
 
 The Interrogation
-Ebby Badawi
+Ebrahim (Ebby) Badawi
 
 This is a template. You must fill in the title,
 author, and this description to match your project!
@@ -67,7 +67,7 @@ let phase1Commands, phase2Commands, phase3Commands;
 // Variable to keep track of phases & help us change from one to another
 let phaseState = 2;
 // Variable to hold the list of names which comes from the JSON file
-let listOfNames;
+let listOfNames, listOfMoods, listOfOccupations;
 // Variable to hold the name, by which the player will be called
 let fixedName;
 // Variable to keep track of how many times the interrogator calles the pplayer by a wrong name
@@ -79,7 +79,7 @@ let nameFound = false;
 $(document).ready(function() {
   // If document is ready and data (List of Names) has loaded, call
   // dataLoaded(data) function.
-  $.getJSON('data/firstNames.json', dataLoaded);
+  $.getJSON('data/dataFile.json', dataLoaded);
 });
 
 /*----------------------->>>> dataLoaded(data) <<<<-----------------------
@@ -87,8 +87,10 @@ $(document).ready(function() {
  * super awesome interrogation.
  *-------------------------------->>>><<<<--------------------------------*/
 function dataLoaded(data) {
-  // Store the list of names into thr listOfNames variable
+  // Store the list of names, moods, and occupations into separate variables
   listOfNames = data.firstNames;
+  listOfMoods = data.moods;
+  listOfOccupations = data.occupations;
   // magicNumber is the the ABSOLUTELY PERFECT position for hand and card,
   // when they are out of frame, which I had a painfully hard time figuring out.
   magicNumber = -1.42 * ($(".handAndCard").innerHeight());
@@ -242,34 +244,34 @@ function getSimilarName(name) {
   let secondChar = name.charAt(1);
   console.log(firstChar + secondChar);
 
-  // Declare minIndex and maxIndex to find the range whithin which we want to
+  // Declare nameMinIndex and nameMaxIndex to find the range whithin which we want to
   // find our random similar name
-  let minIndex = 10000;
-  let maxIndex = 0;
+  let nameMinIndex = 10000;
+  let nameMaxIndex = 0;
 
   // TODO: I can put these into a if statement so it will just calculate once
   // Go through the array of names and find the names starting with specified
-  // characters and find and keep the record of their range insided the array
+  // characters and then find and keep the record of their range in the array
   $.each(listOfNames, function(index, value) {
     if (value.charAt(0) === firstChar && value.charAt(1) === secondChar) {
-      if (minIndex > index) {
-        minIndex = index;
+      if (nameMinIndex > index) {
+        nameMinIndex = index;
       };
-      if (maxIndex < index) {
-        maxIndex = index;
+      if (nameMaxIndex < index) {
+        nameMaxIndex = index;
       };
     };
   });
-  console.log(`min: ${minIndex}, max: ${maxIndex}`);
+  console.log(`min: ${nameMinIndex}, max: ${nameMaxIndex}`);
 
   // Some times it couldn't find the range, so let us know if it happen
   // if not, pass the range and array to getRandomElement() function and
   // return the name it returns
-  if (minIndex > maxIndex) {
+  if (nameMinIndex > nameMaxIndex) {
     nameFound = false;
   } else {
     nameFound = true;
-    return getRandomElement(listOfNames, minIndex, maxIndex);
+    return getRandomElement(listOfNames, nameMinIndex, nameMaxIndex);
   };
 }
 
@@ -282,9 +284,11 @@ function bringInTheCard() {
   responsiveVoice.speak(`okay ${fixedName}!
     Now I'm going to show you some cards and you're going to tell me what you see.
     simply say I see blah bla blah.
-    If you want me to change the card for any reason, say change the card, and
-    I will gently do so.
-    let's begin now ${fixedName}, tell me what do you see!`, 'UK English Male', voiceParameters);
+    If you want me to change a card for any reason,
+    say change the card,
+    and I will gently do so.
+    let's begin now ${fixedName},
+    tell me what do you see!`, 'UK English Male', voiceParameters);
 
   // Pick a card from our set of cards
   shuffle(rorschachCards);
@@ -301,42 +305,97 @@ function bringInTheCard() {
 }
 
 /*---------------------->>>> changeTheCard() <<<<----------------------
- *
- *
- *
+ * It is called whenever player says "change the card" during phase 3
+ * Basically it animate the hand into the frame, then the hand and the
+ * card out of the frame, changes the card, animates the hand and the
+ + new card into the frame, and lastely, animates the hand back out of frame.
  *-------------------------------->>>><<<<--------------------------------*/
 function changeTheCard() {
   // Animate the hand into frame
   $("#hand").animate({
     "top": 0
-  }, 2000, "swing");
-  // Animate the hand and the card out of the frame
-  $(".handAndCard").animate({
-    "top": magicNumber
-  }, 1000, "swing");
-
-  // Change the card by
-  // Picking a card from our set of cards
-  shuffle(rorschachCards);
-  // Replace the card
-  $rorschachCard.attr('src', rorschachCards[0]);
-
-  // Bring in the new card (Animate the hand and the card into the frame)
-  $(".handAndCard").animate({
-    "top": 0
-  }, 2000, "swing");
-  // Animate the hand out of the frame
-  $("#hand").animate({
-    "top": magicNumber
-  }, 2000, "swing");
+  }, 2000, "swing", function() {
+    // Animate the hand and the card out of the frame
+    $(".handAndCard").animate({
+      "top": magicNumber
+    }, 1000, "swing", function() {
+      // Change the card by
+      // Picking a card from our shuffled set of cards
+      shuffle(rorschachCards);
+      // Replace the card
+      $rorschachCard.attr('src', rorschachCards[0]);
+      // Bring in the new card (Animate the hand and the card into the frame)
+      $(".handAndCard").animate({
+        "top": 0
+      }, 2000, "swing", function() {
+        // Animate the hand out of the frame
+        $("#hand").animate({
+          "top": magicNumber
+        }, 2000, "swing");
+      });
+    });
+  });
 }
 
-/*------------------------->>>>handleAnswer() <<<<------------------------
+/*------------------------>>>>handleAnswer(tag) <<<<-----------------------
  *
  *
  *-------------------------------->>>><<<<--------------------------------*/
-function handleAnswer() {
+function handleAnswer(answer) {
+  // Declare variables to get the first two characters of what player just
+  // said and store them.
+  let firstChar = answer.charAt(0);
+  console.log(firstChar);
 
+  // Declare nameMinIndex and nameMaxIndex to find the range whithin which we want to
+  // find our random similar name
+  let moodMinIndex = 10000;
+  let occupationMinIndex = 10000;
+  let moodMaxIndex = 0;
+  let occupationMaxIndex = 0;
+
+  // Go through the array of moods and find the moods starting with specified
+  // character and then find and keep the record of their range in the array
+  $.each(listOfMoods, function(index, value) {
+    if (value.charAt(0) === firstChar) {
+      if (moodMinIndex > index) {
+        moodMinIndex = index;
+      };
+      if (moodMaxIndex < index) {
+        moodMaxIndex = index;
+      };
+    };
+    // in case it could not find the range, assign min & max to 0 and array length
+    if (moodMinIndex > moodMaxIndex) {
+      moodMinIndex = 0;
+      moodMaxIndex = listOfMoods.length;
+    }
+  });
+  // Do the same thing for the array of occupations
+  $.each(listOfOccupations, function(index, value) {
+    if (value.charAt(0) === firstChar) {
+      if (occupationMinIndex > index) {
+        occupationMinIndex = index;
+      };
+      if (occupationMaxIndex < index) {
+        occupationMaxIndex = index;
+      };
+    };
+    // in case it could not find the range, assign min & max to 0 and array length
+    if (occupationMinIndex > occupationMaxIndex) {
+      occupationMinIndex = 0;
+      occupationMaxIndex = listOfOccupations.length;
+    }
+  });
+
+  // now say it
+  let tempMood = getRandomElement(listOfMoods, moodMinIndex, moodMaxIndex);
+  let tempOccupation = getRandomElement(listOfOccupations, occupationMinIndex, occupationMaxIndex);
+
+  responsiveVoice(`${tempMood} ${tempOccupation}?`,'UK English Male', {
+      rate: Math.random(),
+      pitch: Math.random()
+    });
 }
 
 /*-------------->>>> getRandomElement(array, min, max) <<<<--------------
@@ -359,3 +418,5 @@ function shuffle(a) {
   }
   return a;
 }
+
+// TODO: what was your name again?!
