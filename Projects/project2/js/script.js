@@ -44,11 +44,15 @@ let excuses = [
   "what a wonderful name, but say it again because I couldn't hear what you've said",
   "scream your name louder, if you may",
   "what?",
-  "sorry, I wasn't listening. could you please repeat?"
+  "sorry, I wasn't listening. could you please repeat?",
+  "haha haha ha, what?"
 ]
-//
+// Array of the interrogator`s dialogs to intimidate the player a bit
 let changingCardsDialog = [
-
+  "mmm okay, okay",
+  "it's cool, cool cool coocoocoocoocoocool",
+  "okay, we get back to this one after",
+  "you can't run from it, wha wha, whatever your name is!"
 ]
 // Voice parameters for our super cool interrogator
 let voiceParameters = {
@@ -64,12 +68,12 @@ let magicNumber;
 let introLineIndex = 0;
 // Boolean to know whether the player has once clicked on the screen
 let clickedOnce = false;
-//
+// Variable to know whether the game has started or not
 let gameStarted = false;
 // Variables to hold annyang's commands for different phases
 let phase1Commands, phase2Commands, phase3Commands;
 // Variable to keep track of phases & help us change from one to another
-let phaseState = 2;
+let phaseState = 1;
 // Variable to hold the list of names which comes from the JSON file
 let listOfNames, listOfMoods, listOfOccupations;
 // Variable to hold the name, by which the player will be called
@@ -128,29 +132,34 @@ function dataLoaded(data) {
     annyang.start();
   }
 
-
+  // Variable to hold our start button element
   let $pressStart = $('.start');
+  // Create the start button and hide it (so we can fade it in right away)
   $pressStart.button().hide();
-  $pressStart.fadeIn().click(function() {
-    $(this).fadeOut("1000", function() {
-      $(this).remove();
-    });
-    // Give the defined commands for phase1 to annyang by using its
-    // .addCommands() function.
-    annyang.addCommands(phase1Commands);
-    //
-    responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
-    introLineIndex++;
-    clickedOnce = !clickedOnce;
-  });
-
+  // Center the button in the pge
   $pressStart.offset({
     // top: $(window).height() / 2,
     // left: $(window).width() / 2
     top: Math.max(0, (($(window).height() - $pressStart.outerHeight()) / 2) + $(window).scrollTop()),
     left: Math.max(0, (($(window).width() - $pressStart.outerWidth()) / 2) + $(window).scrollLeft())
   });
+  // fade in the button, and if user clicked on it =>
+  $pressStart.fadeIn().click(function() {
+    // <= fade it out and remove it from the page
+    $(this).fadeOut("1000", function() {
+      $(this).remove();
+    });
+    // Give the defined commands for phase1 to annyang by using its
+    // .addCommands() function. Now annyang is ready to understand.
+    annyang.addCommands(phase1Commands);
+    // ask if the player ready or not
+    responsiveVoice.speak(intro[0], 'UK English Male', voiceParameters);
+    introLineIndex++;
+    // player has clicked once
+    clickedOnce = true;
+  });
 
+  // If player clicked on the page more than once, rost him/her
   $("body").on("click", function() {
     if (clickedOnce && gameStarted) {
       responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
@@ -161,6 +170,7 @@ function dataLoaded(data) {
 /*------------------------>>>> changePhase() <<<<------------------------
  * It is called whenever the game state needs to be changed.
  * It removes the current annyang commands, and adds the next phases commands
+ * TODO: change the phase while game is running for the sake of debugging
  *-------------------------------->>>><<<<--------------------------------*/
 function changePhase() {
   annyang.removeCommands();
@@ -180,22 +190,26 @@ function changePhase() {
 }
 
 /*--------------------->>>> startInterrogation() <<<<---------------------
- *
- *
- *
+ * It is called by annyang when player says I'm Ready.
+ * It is also called when player asks why.
+ * It goes through the list of dialogs it should say for the intro (phase 1),
+ * and when it's finished, it calls changePhase() and goes to the next phase.
  *-------------------------------->>>><<<<--------------------------------*/
 function startInterrogation() {
+  // The game has started.
+  // This boolean is used to know when player has clicked on the screen.
   gameStarted = true;
+  // When intro dialogs are finished, change the phase and jump out
   if (introLineIndex === intro.length - 2) {
     // Remove intro commands
     responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
     changePhase();
-    // annyang.removeCommands();
-    // annyang.addCommands(phase2Commands);
     return;
   }
+  // say intro dialogs and advance
   responsiveVoice.speak(intro[introLineIndex], 'UK English Male', voiceParameters);
   introLineIndex++;
+  // Callback startInterrogation() function so we can go to the next phase
   if (introLineIndex === intro.length - 2 && annyang.isListening()) {
     startInterrogation();
     console.log("tell me your name");
@@ -212,28 +226,42 @@ function noAnswer(tag) {
 }
 
 /*----------------->>>> dontUnderstandTheName(name) <<<<-----------------
- *
- *
- *
+ * It is called by annyang in phase 2. It gets whatever player says,
+ * which is his/her name based on the previous conversation, and passes
+ * it to the getSimilarName() function which then returnes a name similar
+ * to what player has said, and afterwards it says the similar name.
+ * It repeats this action for MAX_WRONG_NAMES times.
  *-------------------------------->>>><<<<--------------------------------*/
 function dontUnderstandTheName(name) {
   console.log(name);
+  // Get a name similar to what player's said and put it in a variable (tempName)
   let tempName = getSimilarName(name);
-
+  // Repeat the process of not understanding players name for couple of times
   if (wrongNameCounter < MAX_WRONG_NAMES) {
+    // If getSimilarName() function has found a similar name, say it
+    // and add 1 to wrongNameCounter.
     if (nameFound) {
       responsiveVoice.speak(`${tempName}?!`, 'UK English Male', voiceParameters);
       wrongNameCounter++;
     } else {
+      // Else, shuffle the excuses and pull out one and say it in order to make
+      // the player say his/her name again.
       shuffle(excuses);
       responsiveVoice.speak(`${excuses[0]}?!`, 'UK English Male', voiceParameters);
     };
   } else {
+    // When you messed enough with the player, remember the last wrong name
     fixedName = tempName;
-    changePhase();
-    // annyang.removeCommands();
-    // annyang.addCommands(phase3Commands);
-    responsiveVoice.speak(`enough-fooling-around! from now on, your name is ${fixedName}!`, 'UK English Male', voiceParameters);
+    // QUESTION: can we have some of our parameters in a variable such as voiceParameters
+    // and add some more parameters after ?!
+    // Then say this line, and call changePhase() function at the end.
+    responsiveVoice.speak(`enough-fooling-around!
+      from now on, your name is ${fixedName}!`, 'UK English Male', {
+        pitch: 1,
+        rate: 0.75,
+        volume: 0.5,
+        onend: changePhase
+      });
   }
 }
 
@@ -243,7 +271,6 @@ function dontUnderstandTheName(name) {
  * calling getRandomElement function, it picks one of those names and returns it.
  *-------------------------------->>>><<<<--------------------------------*/
 function getSimilarName(name) {
-
   // Declare variables to get the first two characters of what player just
   // said and store them.
   let firstChar = name.charAt(0);
@@ -286,7 +313,7 @@ function getSimilarName(name) {
  * it into the frame.
  *-------------------------------->>>><<<<--------------------------------*/
 function bringInTheCard() {
-  // Instructions of this phase
+  // Say the instructions of this phase
   responsiveVoice.speak(`okay ${fixedName}!
     Now I'm going to show you some cards and you're going to tell me what you see.
     simply say I see blah bla blah.
@@ -317,6 +344,10 @@ function bringInTheCard() {
  + new card into the frame, and lastely, animates the hand back out of frame.
  *-------------------------------->>>><<<<--------------------------------*/
 function changeTheCard() {
+  // talk to the player
+  // TODO: replace shuffle with random, and then go back to asking name stage
+  shuffle(changingCardsDialog);
+  responsiveVoice.speak(`${changingCardsDialog[0]}?!`, 'UK English Male', voiceParameters);
   // Animate the hand into frame
   $("#hand").animate({
     "top": 0
@@ -426,3 +457,4 @@ function shuffle(a) {
 }
 
 // TODO: what was your name again?!
+// TODO: Rita rhyming names
