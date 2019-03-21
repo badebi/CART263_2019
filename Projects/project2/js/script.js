@@ -5,8 +5,14 @@
 The Interrogation
 Ebrahim (Ebby) Badawi
 
-This is a template. You must fill in the title,
-author, and this description to match your project!
+Welcome to the interrogation,
+a situation in which the interrogator does not understand what you are saying,
+nonetheless it continues to ask the questions which you have answered multiple
+times. so sit back and relax have fun dealing with my super inteligent interrogator.
+
+Thanks to my mom for giving me this idea by asking me loudly "how was your day",
+while she was in the kitchen with the fan on, and I was in my room upstairs
+with the door closed.
 
 ******************/
 
@@ -550,5 +556,5 @@ function shuffle(a) {
   return a;
 }
 
-// TODO: what was your name again?!
+// TODO: what was your name again?! DONE
 // TODO: Rita rhyming names
