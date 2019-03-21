@@ -45,14 +45,26 @@ let excuses = [
   "scream your name louder, if you may",
   "what?",
   "sorry, I wasn't listening. could you please repeat?",
-  "haha haha ha, what?"
+  "hahaha, what?"
 ]
 // Array of the interrogator`s dialogs to intimidate the player a bit
 let changingCardsDialog = [
   "mmm okay, okay",
   "it's cool, cool cool coocoocoocoocoocool",
   "okay, we get back to this one after",
-  "you can't run from it, wha wha, whatever your name is!"
+  "you can't run from it, mmm, sorry what was your name again!?"
+]
+//
+let interruptions = [
+  "tell me what you see?",
+  "just answer the question!",
+  "what do you see!",
+  "why do you talk so much, just give me the answer. what do you see",
+  "I repeat, what do you see in this shitty picture",
+  "you're starting to walk on my nerves, what do you see?",
+  "what? don't tell me that you see shit, cuz I won't believe it",
+  "just tell me what you see",
+  "Am I annoying you? awesome, because I just forgot your name, what was you name again ?!"
 ]
 // Voice parameters for our super cool interrogator
 let voiceParameters = {
@@ -80,6 +92,8 @@ let listOfNames, listOfMoods, listOfOccupations;
 let fixedName;
 // Variable to keep track of how many times the interrogator calles the pplayer by a wrong name
 let wrongNameCounter = 0;
+//
+let interruptionsCounter = 0;
 // Boolean to know whether or not the interrogator has found a similar name to player's name
 let nameFound = false;
 
@@ -125,7 +139,8 @@ function dataLoaded(data) {
 
     phase3Commands = {
       "change the card": changeTheCard,
-      "I see *tag": handleAnswer
+      "I see *tag": handleAnswer,
+      "*tag": interruptPlayer
     }
 
     // Annyand, start listening to me
@@ -243,6 +258,8 @@ function dontUnderstandTheName(name) {
     if (nameFound) {
       responsiveVoice.speak(`${tempName}?!`, 'UK English Male', voiceParameters);
       wrongNameCounter++;
+      // When you messed enough with the player, remember the last wrong name
+      fixedName = tempName;
     } else {
       // Else, shuffle the excuses and pull out one and say it in order to make
       // the player say his/her name again.
@@ -250,18 +267,17 @@ function dontUnderstandTheName(name) {
       responsiveVoice.speak(`${excuses[0]}?!`, 'UK English Male', voiceParameters);
     };
   } else {
-    // When you messed enough with the player, remember the last wrong name
-    fixedName = tempName;
+
     // QUESTION: can we have some of our parameters in a variable such as voiceParameters
     // and add some more parameters after ?!
     // Then say this line, and call changePhase() function at the end.
     responsiveVoice.speak(`enough-fooling-around!
       from now on, your name is ${fixedName}!`, 'UK English Male', {
-        pitch: 1,
-        rate: 0.75,
-        volume: 0.5,
-        onend: changePhase
-      });
+      pitch: 1,
+      rate: 0.75,
+      volume: 0.5,
+      onend: changePhase
+    });
   }
 }
 
@@ -374,7 +390,7 @@ function changeTheCard() {
   });
 }
 
-/*------------------------>>>>handleAnswer(tag) <<<<-----------------------
+/*----------------------->>>> handleAnswer(tag) <<<<----------------------
  *
  *
  *-------------------------------->>>><<<<--------------------------------*/
@@ -429,11 +445,40 @@ function handleAnswer(answer) {
   let tempMood = getRandomElement(listOfMoods, moodMinIndex, moodMaxIndex);
   let tempOccupation = getRandomElement(listOfOccupations, occupationMinIndex, occupationMaxIndex);
 
-  responsiveVoice(`${tempMood} ${tempOccupation}?`, 'UK English Male', {
+  responsiveVoice.speak(`you see ${tempMood} ${tempOccupation}?`, 'UK English Male', {
     rate: Math.random(),
     pitch: Math.random()
   });
 }
+
+/*---------------------->>>> interruptPlayer(tag) <<<<---------------------
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
+function interruptPlayer(tag) {
+  if (interruptionsCounter < 4) {
+    let tempInterruption = shuffle(interruptions);
+    responsiveVoice.speak(`${interruptions[0]}?`, 'UK English Male', {
+      rate: Math.random(),
+      pitch: Math.random(),
+      onend: function () {
+        if (interruptions[0].charAt(0) === 'A' && interruptions[1].charAt(1) === 'm') {
+          goBackToPhase2();
+        }
+      }
+    });
+    interruptionsCounter ++;
+  }
+}
+
+/*------------------------>>>> goBackToPhase2() <<<<-----------------------
+ *
+ *
+ *-------------------------------->>>><<<<--------------------------------*/
+function goBackToPhase2() {
+  
+}
+
 
 /*-------------->>>> getRandomElement(array, min, max) <<<<--------------
  * Gets an array with a range, and returns the value of a random index
