@@ -55,6 +55,9 @@ function giveMeADescription(data) {
     roomArticle = "an";
   }
 
-  let description = `${condiment} ${verb} like ${catArticle} ${cat} in ${roomArticle} ${room}.`
+  let condition = getRandomElement(data.conditions);
+    console.log("condition => " + condition);
+
+  let description = `${condiment} ${verb} like ${catArticle} ${cat} in ${roomArticle} ${room} full of ${condition}.`
   $('body').append(`<div id= "des">${description}</div>`);
 }
