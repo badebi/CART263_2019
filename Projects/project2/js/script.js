@@ -13,6 +13,7 @@ author, and this description to match your project!
 /*-------------------------->>>> CONSTANTS <<<<--------------------------*/
 
 const MAX_WRONG_NAMES = 4;
+const MAX_INTERRUPTS = 4;
 
 /*-------------------------->>>> VARIABLES <<<<--------------------------*/
 // Array of list if card Rorschach locations
@@ -52,7 +53,7 @@ let changingCardsDialog = [
   "mmm okay, okay",
   "it's cool, cool cool coocoocoocoocoocool",
   "okay, we get back to this one after",
-  "you can't run from it, shit, I fotgot your name, what was your name again!?"
+  "you can't run from it, shit, I forgot your name, what was your name again!?"
 ]
 //
 let interruptions = [
@@ -63,7 +64,6 @@ let interruptions = [
   "I repeat, what do you see in this shitty picture",
   "you're starting to walk on my nerves, what do you see?",
   "what? don't tell me that you see shit, cuz I won't believe it",
-  "just tell me what you see",
   "Am I annoying you? awesome, because I just forgot your name, what was you name again ?!"
 ]
 // Voice parameters for our super cool interrogator
@@ -80,7 +80,7 @@ let magicNumber;
 let introLineIndex = 0;
 // Boolean to know whether the player has once clicked on the screen
 let clickedOnce = false;
-// Variable to know whether the game has started or not
+// Boolean to know whether the game has started or not
 let gameStarted = false;
 // Variables to hold annyang's commands for different phases
 let phase1Commands, phase2Commands, phase3CommandsPart1, phase3CommandsPart2;
@@ -90,12 +90,14 @@ let phaseState = 1;
 let listOfNames, listOfMoods, listOfOccupations;
 // Variable to hold the name, by which the player will be called
 let fixedName;
-// Variable to keep track of how many times the interrogator calles the pplayer by a wrong name
+// Variable to keep track of how many times the interrogator calles the player by a wrong name
 let wrongNameCounter = 0;
-//
+// Variable to keep track of how many times the interrogator interrupts the player
 let interruptionsCounter = 0;
 // Boolean to know whether or not the interrogator has found a similar name to player's name
 let nameFound = false;
+// Boolean to know wheter player has listened to the instructions of the phase 3 once or not
+let haveBeenHereOnce = false;
 
 // Check if the document is ready to run
 $(document).ready(function() {
@@ -139,7 +141,7 @@ function dataLoaded(data) {
 
     phase3CommandsPart1 = {
       "change the card": changeTheCard,
-      "*tag": interruptPlayer
+      ":tag": interruptPlayer
     }
 
     phase3CommandsPart2 = {
@@ -335,15 +337,22 @@ function getSimilarName(name) {
  * it into the frame.
  *-------------------------------->>>><<<<--------------------------------*/
 function bringInTheCard() {
-  // Say the instructions of this phase
-  responsiveVoice.speak(`okay ${fixedName}!
-    Now I'm going to show you some cards and you're going to tell me what you see.
-    simply say I see blah bla blah.
-    If you want me to change a card for any reason,
-    say change the card,
-    and I will gently do so.
-    let's begin now ${fixedName},
-    tell me what do you see!`, 'UK English Male', voiceParameters);
+  if (!haveBeenHereOnce) {
+    // Say the instructions of this phase
+    responsiveVoice.speak(`okay ${fixedName}!
+      Now I'm going to show you some cards and you're going to tell me what you see.
+      simply say I see blah bla blah.
+      If you want me to change a card for any reason,
+      say change the card,
+      and I will gently do so.
+      let's begin now ${fixedName},
+      tell me what do you see!`, 'UK English Male', voiceParameters);
+      haveBeenHereOnce = true;
+  } else {
+    responsiveVoice.speak(`okay ${fixedName}!
+      you have been here before,
+      so tell me what do you see ${fixedName}?`, 'UK English Male', voiceParameters);
+  }
 
   // Pick a card from our set of cards
   shuffle(rorschachCards);
@@ -374,6 +383,7 @@ function changeTheCard() {
     rate: 0.75,
     volume: 0.5
   });
+  // Check if interrogator haas forgotten the player's name, if yes, go back to phase 2
   if (changingCardsDialog[0].charAt(0) === 'y' && changingCardsDialog[0].charAt(1) === 'o') {
     goBackToPhase2();
     return;
@@ -405,8 +415,10 @@ function changeTheCard() {
 }
 
 /*----------------------->>>> handleAnswer(tag) <<<<----------------------
- *
- *
+ * Called by annyang in phase 3 part 2; it listens to what player says, then
+ * it does not care about what s/he has said, and it looks for a random
+ * combination of the moods and occupation, which start with the first letter
+ * of what player has said. (ideally :D)
  *-------------------------------->>>><<<<--------------------------------*/
 function handleAnswer(answer) {
   // Declare variables to get the first two characters of what player just
@@ -460,21 +472,24 @@ function handleAnswer(answer) {
   let tempMood = getRandomElement(listOfMoods, moodMinIndex, moodMaxIndex);
   let tempOccupation = getRandomElement(listOfOccupations, occupationMinIndex, occupationMaxIndex);
 
-  responsiveVoice.speak(`${tempMood} ${tempOccupation} question mark?`, 'UK English Male', voiceParameters);
+  responsiveVoice.speak(`so you see ${tempMood} ${tempOccupation}?
+    what else do you see ${fixedName}?`, 'UK English Male', voiceParameters);
 }
 
 /*---------------------->>>> interruptPlayer(tag) <<<<---------------------
- *
- *
+ * Called by annyang at the beginning of phase 3 and interrupts the player
+ * by not listening to what s/he is saying. it does it MAX_INTERRUPTS times
+ * and then it goes to the phase 3's 2nd part and starts listening
  *-------------------------------->>>><<<<--------------------------------*/
 function interruptPlayer(tag) {
-  if (interruptionsCounter < 4) {
+  if (interruptionsCounter < MAX_INTERRUPTS) {
     let tempInterruption = shuffle(interruptions);
     responsiveVoice.speak(`${interruptions[0]}?`, 'UK English Male', {
       pitch: 1,
       rate: 0.75,
       volume: 0.5,
       onend: function() {
+        // If the interrogator forgets player's name, go bback to phase 2
         if (interruptions[0].charAt(0) === 'A' && interruptions[0].charAt(1) === 'm') {
           goBackToPhase2();
         }
@@ -482,17 +497,21 @@ function interruptPlayer(tag) {
     });
     interruptionsCounter++;
   } else {
+    // replace annyang commands
     annyang.removeCommands();
     annyang.addCommands(phase3CommandsPart2);
+    // zero interruptionsCounter out in case we come back to this stage again
+    interruptionsCounter = 0;
   }
-  // QUESTION: should i have an else as well and remove the command from annyang ?
+  // QUESTION: should i have an else as well and remove the command from annyang ? YES
 }
 
 /*------------------------>>>> goBackToPhase2() <<<<-----------------------
- *
- *
+ * Called whenever the interrogator forgets the player's name, which makes the
+ * interrogation endless (and maybe boring :D but there is a huge room for improvement)
  *-------------------------------->>>><<<<--------------------------------*/
 function goBackToPhase2() {
+  // Take the card out
   // Animate the hand into frame
   $("#hand").animate({
     "top": 0
@@ -504,6 +523,7 @@ function goBackToPhase2() {
       $(".handAndCard").hide();
     });
   });
+  // Go back to phase 2
   phaseState = 1;
   changePhase();
 }
