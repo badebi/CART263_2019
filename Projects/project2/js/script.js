@@ -12,7 +12,7 @@ author, and this description to match your project!
 
 /*-------------------------->>>> CONSTANTS <<<<--------------------------*/
 
-const MAX_WRONG_NAMES = 3;
+const MAX_WRONG_NAMES = 4;
 
 /*-------------------------->>>> VARIABLES <<<<--------------------------*/
 // Array of list if card Rorschach locations
@@ -52,7 +52,7 @@ let changingCardsDialog = [
   "mmm okay, okay",
   "it's cool, cool cool coocoocoocoocoocool",
   "okay, we get back to this one after",
-  "you can't run from it, mmm, sorry what was your name again!?"
+  "you can't run from it, shit, I fotgot your name, what was your name again!?"
 ]
 //
 let interruptions = [
@@ -70,7 +70,7 @@ let interruptions = [
 let voiceParameters = {
   pitch: 1,
   rate: 0.75,
-  volume: 0.5,
+  volume: 0.5
 }
 // Variable to hold our card element
 let $rorschachCard;
@@ -83,7 +83,7 @@ let clickedOnce = false;
 // Variable to know whether the game has started or not
 let gameStarted = false;
 // Variables to hold annyang's commands for different phases
-let phase1Commands, phase2Commands, phase3Commands;
+let phase1Commands, phase2Commands, phase3CommandsPart1, phase3CommandsPart2;
 // Variable to keep track of phases & help us change from one to another
 let phaseState = 1;
 // Variable to hold the list of names which comes from the JSON file
@@ -137,10 +137,14 @@ function dataLoaded(data) {
       "*tag": dontUnderstandTheName
     }
 
-    phase3Commands = {
+    phase3CommandsPart1 = {
       "change the card": changeTheCard,
-      "I see *tag": handleAnswer,
       "*tag": interruptPlayer
+    }
+
+    phase3CommandsPart2 = {
+      "change the card": changeTheCard,
+      "I see *tag": handleAnswer
     }
 
     // Annyand, start listening to me
@@ -178,6 +182,7 @@ function dataLoaded(data) {
   $("body").on("click", function() {
     if (clickedOnce && gameStarted) {
       responsiveVoice.speak(intro[intro.length - 1], 'UK English Male', voiceParameters);
+      goBackToPhase2();
     }
   });
 }
@@ -195,7 +200,7 @@ function changePhase() {
       phaseState++;
       break;
     case 2:
-      annyang.addCommands(phase3Commands);
+      annyang.addCommands(phase3CommandsPart1);
       phaseState++;
       setTimeout(bringInTheCard, 3000);
       break;
@@ -271,6 +276,7 @@ function dontUnderstandTheName(name) {
     // QUESTION: can we have some of our parameters in a variable such as voiceParameters
     // and add some more parameters after ?!
     // Then say this line, and call changePhase() function at the end.
+    wrongNameCounter = 0;
     responsiveVoice.speak(`enough-fooling-around!
       from now on, your name is ${fixedName}!`, 'UK English Male', {
       pitch: 1,
@@ -363,7 +369,15 @@ function changeTheCard() {
   // talk to the player
   // TODO: replace shuffle with random, and then go back to asking name stage
   shuffle(changingCardsDialog);
-  responsiveVoice.speak(`${changingCardsDialog[0]}?!`, 'UK English Male', voiceParameters);
+  responsiveVoice.speak(`${changingCardsDialog[0]}?!`, 'UK English Male', {
+    pitch: 1,
+    rate: 0.75,
+    volume: 0.5
+  });
+  if (changingCardsDialog[0].charAt(0) === 'y' && changingCardsDialog[0].charAt(1) === 'o') {
+    goBackToPhase2();
+    return;
+  }
   // Animate the hand into frame
   $("#hand").animate({
     "top": 0
@@ -402,8 +416,8 @@ function handleAnswer(answer) {
 
   // Declare nameMinIndex and nameMaxIndex to find the range whithin which we want to
   // find our random similar name
-  let moodMinIndex = 10000;
-  let occupationMinIndex = 10000;
+  let moodMinIndex = 100000;
+  let occupationMinIndex = 100000;
   let moodMaxIndex = 0;
   let occupationMaxIndex = 0;
 
@@ -418,6 +432,7 @@ function handleAnswer(answer) {
         moodMaxIndex = index;
       };
     };
+    console.log(`min: ${moodMinIndex}, max: ${moodMaxIndex}`)
     // in case it could not find the range, assign min & max to 0 and array length
     if (moodMinIndex > moodMaxIndex) {
       moodMinIndex = 0;
@@ -445,10 +460,7 @@ function handleAnswer(answer) {
   let tempMood = getRandomElement(listOfMoods, moodMinIndex, moodMaxIndex);
   let tempOccupation = getRandomElement(listOfOccupations, occupationMinIndex, occupationMaxIndex);
 
-  responsiveVoice.speak(`you see ${tempMood} ${tempOccupation}?`, 'UK English Male', {
-    rate: Math.random(),
-    pitch: Math.random()
-  });
+  responsiveVoice.speak(`${tempMood} ${tempOccupation} question mark?`, 'UK English Male', voiceParameters);
 }
 
 /*---------------------->>>> interruptPlayer(tag) <<<<---------------------
@@ -459,16 +471,21 @@ function interruptPlayer(tag) {
   if (interruptionsCounter < 4) {
     let tempInterruption = shuffle(interruptions);
     responsiveVoice.speak(`${interruptions[0]}?`, 'UK English Male', {
-      rate: Math.random(),
-      pitch: Math.random(),
-      onend: function () {
-        if (interruptions[0].charAt(0) === 'A' && interruptions[1].charAt(1) === 'm') {
+      pitch: 1,
+      rate: 0.75,
+      volume: 0.5,
+      onend: function() {
+        if (interruptions[0].charAt(0) === 'A' && interruptions[0].charAt(1) === 'm') {
           goBackToPhase2();
         }
       }
     });
-    interruptionsCounter ++;
+    interruptionsCounter++;
+  } else {
+    annyang.removeCommands();
+    annyang.addCommands(phase3CommandsPart2);
   }
+  // QUESTION: should i have an else as well and remove the command from annyang ?
 }
 
 /*------------------------>>>> goBackToPhase2() <<<<-----------------------
@@ -476,7 +493,19 @@ function interruptPlayer(tag) {
  *
  *-------------------------------->>>><<<<--------------------------------*/
 function goBackToPhase2() {
-  
+  // Animate the hand into frame
+  $("#hand").animate({
+    "top": 0
+  }, 2000, "swing", function() {
+    // Animate the hand and the card out of the frame
+    $(".handAndCard").animate({
+      "top": magicNumber
+    }, 1000, "swing", function() {
+      $(".handAndCard").hide();
+    });
+  });
+  phaseState = 1;
+  changePhase();
 }
 
 
