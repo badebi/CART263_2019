@@ -49,6 +49,11 @@ function preload() {
 // Description of setup
 
 function setup() {
+  createCanvas (windowWidth, windowHeight);
+  background(50);
+  noStroke();
+  fill(255);
+  text("Click to start, please.", 50, 200);
   synth = new Pizzicato.Sound({
     source: 'wave',
     options: {
@@ -103,6 +108,8 @@ function mousePressed() {
   // NOTE: to fix the variable intervals
   if (!isStarted) {
     //setInterval(playNote, NOTE_LENGTH);
+    background(50);
+    text("Now move your mouse and enjoy the chaos.", 50, 200);
     setTimeout(playNote, NOTE_LENGTH);
     setInterval(playDrum, 250);
     isStarted = true;
