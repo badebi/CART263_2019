@@ -24,10 +24,11 @@ let snare;
 let hihat;
 let dog;
 
-let delay;
+let reverb;
 let dubDelay;
 let tremolo;
 let lowPassFilter;
+let distortion;
 
 let isStarted = false;
 
@@ -48,6 +49,11 @@ function preload() {
 // Description of setup
 
 function setup() {
+  createCanvas (windowWidth, windowHeight);
+  background(50);
+  noStroke();
+  fill(255);
+  text("Click to start, please.", 50, 200);
   synth = new Pizzicato.Sound({
     source: 'wave',
     options: {
@@ -55,11 +61,6 @@ function setup() {
     }
   });
 
-  delay = new Pizzicato.Effects.Delay({
-    feedback: 0.6,
-    time: 0.4,
-    mix: 0.5
-  });
 
   dubDelay = new Pizzicato.Effects.DubDelay({
     feedback: 0.57,
@@ -76,8 +77,19 @@ function setup() {
 
   lowPassFilter = new Pizzicato.Effects.LowPassFilter({
     frequency: 400,
-    peak: 10
+    peak: 9
   });
+
+  reverb = new Pizzicato.Effects.Reverb({
+    time: 3,
+    decay: 3,
+    reverse: false,
+    mix: 0.5
+  });
+
+  distortion = new Pizzicato.Effects.Distortion({
+    gain: 0.4
+});
 
   kick = new Pizzicato.Sound('assets/sounds/kick.wav');
   snare = new Pizzicato.Sound('assets/sounds/snare.wav');
@@ -86,21 +98,18 @@ function setup() {
 
   kick.addEffect(dubDelay);
   synth.addEffect(lowPassFilter);
+  synth.addEffect(tremolo);
+  synth.addEffect(reverb);
+  dog.addEffect(distortion);
 }
 
-
-// draw()
-//
-// Description of draw()
-
-function draw() {
-
-}
 
 function mousePressed() {
   // NOTE: to fix the variable intervals
   if (!isStarted) {
     //setInterval(playNote, NOTE_LENGTH);
+    background(50);
+    text("Now move your mouse and enjoy the chaos.", 50, 200);
     setTimeout(playNote, NOTE_LENGTH);
     setInterval(playDrum, 250);
     isStarted = true;
@@ -109,11 +118,10 @@ function mousePressed() {
 }
 
 function mouseMoved() {
-  console.log(lowPassFilter.frequency);
-  let newFreq = map(mouseX, 0, windowWidth, 70, 420);
-  lowPassFilter.frequency = newFreq;
-  // synth.removeEffect(lowPassFilter);
-  // synth.addEffect(lowPassFilter);
+  // console.log(lowPassFilter.frequency);
+  // let newFreq = map(mouseX, 0, windowWidth, 70, 420);
+  lowPassFilter.frequency = lerp(map(pmouseX, 0, windowWidth, 70, 420), map(mouseX, 0, windowWidth, 70, 420), 0.1);
+  tremolo.depth = lerp(map(pmouseY, windowHeight, 0, 0, 1), map(mouseY, windowHeight, 0, 0, 1), 0.1);
 }
 
 function keyPressed() {
