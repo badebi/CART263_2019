@@ -14,7 +14,7 @@ let vowels = ["a", "e", "i", "o", "u", "A", "E", "I", "O", "U"]
 
 $(document).ready(function() {
   console.log("ready");
-  $.getJSON('/data/data.json', dataLoaded);
+  $.getJSON('data/data.json', dataLoaded);
 });
 
 function dataLoaded(data) {
