@@ -43,7 +43,7 @@ function preload() {
 
 function setup() {
   createCanvas(640, 480, WEBGL);
-  pixelDensity(1);
+  //pixelDensity(1);
   background(51);
   // Initialize columns and rows
   cols = width / videoScale;
@@ -51,17 +51,17 @@ function setup() {
   // Construct the Capture object
   video = createCapture(VIDEO, ready);
   video.size(cols, rows);
-  //video.hide();
+  video.hide();
 
   //ellipses = new Ellipses;
 
-  for (let i = 0; i < cols; i++) {
+  for (let i = 0; i < cols * 4; i += 4) {
     ellipses[i] = [];
     for (let j = 0; j < rows; j++) {
       ellipses[i][j] = new Ellipses(i, j);
     }
   }
-
+  console.log(`ellipses = ${ellipses.length} x ${ellipses[0].length}`);
   // console.log(ellipses[0][0]);
   // console.log(ellipses[0][2]);
 }
@@ -75,6 +75,11 @@ function ready() {
 // Description of draw()
 
 function draw() {
+  let fov = PI / 3.0;
+  let cameraZ = (height / 2.0) / tan(fov / 2.0);
+  perspective(fov, width / height, cameraZ / 10.0, cameraZ * 10.0);
+
+  translate(-width / 2, -height / 2, 0);
   //texture(video);
   //image(video, 0, 0);
   background(0);
@@ -86,7 +91,7 @@ function draw() {
     noiseDetail(15, 0.6);
 
     // Begin loop for columns
-    for (let i = 0; i < cols; i++) {
+    for (let i = 0; i < cols * 4; i += 4) {
 
       yoff = 1000.0;
 
@@ -111,22 +116,23 @@ function draw() {
       xoff += 0.01;
     }
 
-    for (let i = 0; i < cols; i++) {
+    for (let i = 0; i < cols * 4; i += 4) {
       for (let j = 0; j < rows; j++) {
         // here I want to make an condition to avoid the program to go to the matrix when the pixels are not in
         // the range of Gaussian distribution ... In the other words, I just want to draw the pixels based on the
         // Gaussian distribution in each frame, and ignore drawing the other ones.
         // For the accuracy, I applied the Gaussian distribution to the pixels and then I scaled it down to rows and cols
-        let sd = 42.0;
+        let sd = 36.0;
         let xMean = width / 2;
         let yMean = height / 2;
         x2 = randomGaussian(xMean, sd);
         y2 = randomGaussian(yMean, sd);
 
+        //console.log(`x2 = ${floor(x2)}, y2= ${floor(y2)}`);
 
-        //ellipses[floor((x2 / videoScale))][floor((y2 / videoScale))].display();
+        ellipses[floor((x2 / videoScale)) * 4][floor((y2 / videoScale))].display();
 
-        ellipses[floor(i)][floor(j)].display();
+        //ellipses[floor(i)][floor(j)].display();
       }
     }
     //updatePixels();
