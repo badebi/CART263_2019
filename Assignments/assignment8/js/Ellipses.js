@@ -15,7 +15,7 @@ class Ellipses {
     // Reversing x to mirror the image
     // In order to mirror the image, the column is reversed with the following formula:
     // mirrored column = width - i - 1
-    this.loc = (video.width - this.eCol - 1) + (this.eRow * video.width) * 4;
+    this.loc = (video.width - this.eCol - 1) + (this.eRow * video.width) * 4 ;
 
 
     // Each rect is colored white with a size determined by brightness
@@ -24,8 +24,9 @@ class Ellipses {
     this.c[0] = video.pixels[this.loc + 0];
     this.c[1] = video.pixels[this.loc + 1];
     this.c[2] = video.pixels[this.loc + 2];
-    console.log(`${this.c[0]}, ${this.c[1]}, ${this.c[2]}`);
+    //console.log(`${this.c[0]}, ${this.c[1]}, ${this.c[2]}`);
     this.bright = (this.c[0] + this.c[1] + this.c[2]) / 3;
+
 
 
     // A rectangle size is calculated as a function of the pixel's brightness.

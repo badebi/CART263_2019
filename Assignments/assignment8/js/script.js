@@ -21,7 +21,7 @@ let ellipses = [];
 let zoff, yoff, xoff;
 
 // Size of each cell in the grid
-let videoScale = 2;
+let videoScale = 4;
 // Number of columns and rows in our system
 let cols, rows;
 // Variable for capture device
@@ -42,7 +42,7 @@ function preload() {
 // Description of setup
 
 function setup() {
-  createCanvas(640, 480);
+  createCanvas(640, 480, WEBGL);
   pixelDensity(1);
   background(51);
   // Initialize columns and rows
@@ -80,7 +80,6 @@ function draw() {
   background(0);
   if (videoIsReady) {
     video.loadPixels();
-
     xoff = 0.0;
 
     // 15 octaves, with each octave having 60% impact of the one immediately below it
@@ -94,14 +93,14 @@ function draw() {
       // Begin loop for rows
       for (let j = 0; j < rows; j++) {
 
-//         let index = (video.width - i + 1 + (j * video.width)) * 4;
-//       let r = video.pixels[index + 0];
-//       let g = video.pixels[index + 1];
-//       let b = video.pixels[index + 2];
-//       let bright = (r + g + b) / 3;
-//
-// console.log(`${r}, ${g}, ${b}, ${bright}`);
-      //ellipses[i][j].update();
+        //         let index = (video.width - i + 1 + (j * video.width)) * 4;
+        //       let r = video.pixels[index + 0];
+        //       let g = video.pixels[index + 1];
+        //       let b = video.pixels[index + 2];
+        //       let bright = (r + g + b) / 3;
+        //
+        // console.log(`${r}, ${g}, ${b}, ${bright}`);
+        ellipses[i][j].update();
 
 
 
