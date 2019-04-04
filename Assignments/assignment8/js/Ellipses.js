@@ -15,7 +15,7 @@ class Ellipses {
     // Reversing x to mirror the image
     // In order to mirror the image, the column is reversed with the following formula:
     // mirrored column = width - i - 1
-    this.loc = (video.width - this.eCol - 1) + (this.eRow * video.width) * 4 ;
+    this.loc = (video.width - this.eCol - 1) + (this.eRow * video.width) * 4;
 
 
     // Each rect is colored white with a size determined by brightness
@@ -43,7 +43,7 @@ class Ellipses {
     push();
 
     let z = map(this.bright, 0, 200, -100, 100);
-    translate(this.x + videoScale / 2, this.y + videoScale / 2, z);
+    translate(this.x + (videoScale / 2) - (width / 2), this.y + (videoScale / 2) - (height / 2), z);
 
     // set fill and stroke
     fill(10, 42, this.bright);

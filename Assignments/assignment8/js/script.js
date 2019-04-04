@@ -117,14 +117,16 @@ function draw() {
         // the range of Gaussian distribution ... In the other words, I just want to draw the pixels based on the
         // Gaussian distribution in each frame, and ignore drawing the other ones.
         // For the accuracy, I applied the Gaussian distribution to the pixels and then I scaled it down to rows and cols
-        let sd = 36.0;
+        let sd = 42.0;
         let xMean = width / 2;
         let yMean = height / 2;
         x2 = randomGaussian(xMean, sd);
         y2 = randomGaussian(yMean, sd);
 
 
-        ellipses[floor((x2 / videoScale))][floor((y2 / videoScale))].display();
+        //ellipses[floor((x2 / videoScale))][floor((y2 / videoScale))].display();
+
+        ellipses[floor(i)][floor(j)].display();
       }
     }
     //updatePixels();
